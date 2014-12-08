@@ -2,27 +2,30 @@
  * File: functionSafe.js
  */
 
-"use strict";
+
 
 (function() {
   var ParamDefinition = function(settings) {
-    if (settings != null) {
-      
-    }
-  }
+    "use strict";
 
-  Object.defineProperties(ParamDefinition, {
+  };
+
+  Object.defineProperties(ParamDefinition.prototype, {
     'allowNull': {
       configurable: false,
       enumerable: false,
 
-      get: function(){
+      get: function() {
+        "use strict";
+
         return this.allowNull;
       },
 
-      set: function(isAllowNull){
+      set: function(isAllowNull) {
+        "use strict";
+
         if (typeof(isAllowNull) !== 'boolean') {
-          throw TypeError('Property "allowNull" must be of type: "boolean"');
+          throw new TypeError('Property "allowNull" must be of type: "boolean"');
         }
 
         this.allowNull = isAllowNull;
@@ -33,13 +36,17 @@
       configurable: false,
       enumerable: false,
 
-      get: function(){
+      get: function() {
+        "use strict";
+
         return this.allowUndefined;
       },
 
-      set: function(isAllowUndefined){
+      set: function(isAllowUndefined) {
+        "use strict";
+
         if (typeof(isAllowUndefined) !== 'boolean') {
-          throw TypeError('Property "allowUndefined" must be of type: "boolean"');
+          throw new TypeError('Property "allowUndefined" must be of type: "boolean"');
         }
 
         this.allowUndefined = isAllowUndefined;
@@ -51,12 +58,16 @@
       enumerable: false,
 
       get: function() {
+        "use strict";
+
         return this.allowEmpty;
       },
 
-      set: function(isAllowEmpty){
-        if (typeof(isAllowEmpty) !== 'boolean'){
-          throw TypeError('Property "allowEmpty" must be of type: "boolean"');
+      set: function(isAllowEmpty) {
+        "use strict";
+
+        if (typeof(isAllowEmpty) !== 'boolean') {
+          throw new TypeError('Property "allowEmpty" must be of type: "boolean"');
         }
         this.allowEmpty = isAllowEmpty;
       }
@@ -67,19 +78,20 @@
       enumerable: false,
 
       get: function() {
+        "use strict";
+
         return this.paramType;
       },
 
-      set: function(type){
-        if (typeof(type) !== 'string' || typeof(type) !== 'object'){
-          throw TypeError('Property "type" must be of type: "TypeDefinition"');
+      set: function(type) {
+        "use strict";
+
+        if (typeof(type) !== 'string' || typeof(type) !== 'object') {
+          throw new TypeError('Property "type" must be of type: "TypeDefinition"');
         }
         this.paramType = type;
       }
     }
   });
-  ParameterDefinition.prototype = {
-
-
-  };
+  
 })();
