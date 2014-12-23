@@ -4,7 +4,7 @@
 (function() {
   "use strict";
 
-  var ParamDefinition = function(settings) {
+  var ParamDefinition = function ParamDefintion_constructor(settings) {
     this.addProperties(settings);
   };
 

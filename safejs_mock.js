@@ -5,7 +5,7 @@ param1Def = new ParamDefinition({
 
 sjs.func({
   param1: {
-    type: ["string", "number", MyCustomObject],
+    type: ["string", "number", Element],
     pos: 0
   },
   param2: 'string',
