@@ -92,8 +92,7 @@
 
       set: function(types) {
         if (types == null) {
-          throw new TypeError('Property "paramTypes" must be either ' +
-            '(1) An object, (2) A string or (3) an array of a either objects or strings');
+          throw new TypeError('Property "paramTypes" cannot be null or undefined.');
 
         } else if (!_.isArray(types)) {
           types = [types];
@@ -101,7 +100,7 @@
 
         try {
           types.forEach(function(type) {
-            if (!_.isString(type) || !_.isObject(type)) {
+            if (!_.isString(type) && !_.isObject(type)) {
               throw new TypeError('Property "paramTypes" must be either ' +
                 '(1) An object, (2) A string or (3) an array of a either objects or strings');
             }
@@ -211,11 +210,11 @@
       this.addProperty('allowNull', settings.allowNull);
       this.addProperty('allowEmpty', settings.allowEmpty);
       this.addProperty('allowUndefined', settings.allowUndefined);
-      this.addProperty('types', settings.types);
+      this.addProperty('paramTypes', settings.types);
       this.addProperty('pos', settings.pos);
 
     } else if (_.isString(settings) || _.isArray(settings)) {
-      this.addProperty('types', settings);
+      this.addProperty('paramTypes', settings);
     }
   };
 
@@ -251,7 +250,7 @@
     //check for types now
     return this._types.some(function(type) {
       if (_.isString(type)) {
-        checkStringType(type, value);
+        return checkStringType(type, value);
 
       } else {
         return (value instanceof type);
@@ -307,5 +306,5 @@
     }
   };
 
-  window.ParamDefinition = ParamDefinition;
+  window.sjs.ParamDefinition = ParamDefinition;
 })();
