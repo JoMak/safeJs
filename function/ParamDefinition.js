@@ -1,18 +1,44 @@
 /**
- * File: ParamDefintion.js
+ * @file: ParamDefintion.js
+ * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
+ * @version: 1.0.0
  */
 (function() {
   "use strict";
 
+  var Base = window.sjs.Base;
+
   /**
    * ParamDefinition constructor
+   * @constructor
    * @param {Object} settings default values
+   * @since 1.0.0
    */
   var ParamDefinition = function ParamDefintion(settings) {
+    this._super.apply(this, null);
     this.addProperties(settings);
   };
 
+  ParamDefinition.prototype = Object.create(Base.prototype);
+
   Object.defineProperties(ParamDefinition.prototype, {
+    /**
+     * Constructors
+     */
+    'constructor': {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: ParamDefinition
+    },
+
+    '_super': {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: Base
+    },
+
     /**
      * Properties
      */
@@ -272,6 +298,13 @@
 
   };
 
+  /**
+   * Check an object given a string representation of a type
+   * @param {string | String} type String representation of a type. `*` Represents any type.
+   * @param {*} value Object to check it's type against.
+   * @return {boolean | Boolean} If the object is the type given.
+   * Will always return true if `*` is given for a type.
+   */
   ParamDefinition.checkStringType = function ParamDefinition_checkStringType(type, value) {
     if (type === '*') {
       return true;

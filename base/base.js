@@ -1,14 +1,20 @@
 /**
- * File: base.js
+ * @file: base.js
+ * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
+ * @version: 1.0.0
  */
 (function() {
   "use strict";
 
+  /**
+   * @constructor
+   * @since 1.0.0
+   */
   var Base = function Base() {
     //empty
   };
 
-  Object.setProperties(Base.prototype, {
+  Object.defineProperties(Base.prototype, {
     /**
      * Properties
      */
@@ -21,6 +27,27 @@
     },
 
     'enableLogging': {
+      enumerable: false,
+      configurable: false,
+
+      get: function Base_enableLogging_get() {
+        return this._isLogging;
+      },
+
+      set: function Base_enableLogging_set(enable) {
+        if (!_.isBoolean(enable)) {
+          throw new TypeError('Property "enableLogging" must be of type: "boolean"');
+        }
+
+        this._isLogging = enable;
+      },
+    },
+
+    /**
+     * Fields
+     */
+
+    '_isLogging': {
       enumerable: false,
       configurable: false,
       writable: true,
@@ -42,8 +69,8 @@
     return this.prototype.name;
   };
 
-  Base.setEnableLogging = function Base_setEnableLogging(val) {
-    Base.prototype.enableLogging = val;
+  Base.enableLogging = function Base_setEnableLogging(enable) {
+    Base.prototype.enableLogging = enable;
   };
 
   Base.prototype.log = function Base_log(level) {
@@ -53,4 +80,9 @@
   };
 
   window.sjs.Base = Base;
+
+  window.sjs.enableLogging = function sjs_enableLogging(enable) {
+    window.sjs.Base.enableLogging(enable);
+  };
+
 })();

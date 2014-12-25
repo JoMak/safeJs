@@ -1,9 +1,6 @@
-param1Def = new ParamDefinition({
-  type: ["string", "number", MyCustomObject],
-  pos: 0,
-});
+var sjs = window.sjs;
 
-sjs.func({
+var g = sjs.func({
   param1: {
     types: ["string", "number", sjs.ParamDefinition],
     pos: 0
@@ -12,5 +9,12 @@ sjs.func({
   param3: ['function', 'element'],
 
 }, function MyFunction(param1, param2, param3) {
-  console.log('I ran!');
+  "use strict";
+  console.log('I ran!', param1, param2, param3);
 });
+
+g();
+
+g('Karim', '', function(){});
+g(2, 'Piyar Ali', document.createElement('div'));
+g(2);

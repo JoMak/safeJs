@@ -6,6 +6,12 @@
   <script src="./base/base.js"></script>
   <script src="./function/ParamDefinition.js"></script>
   <script src="./function/func.js"></script>
+
+  <script>
+    for (var prop in window.sjs) {
+      window[prop] = window.sjs[prop]
+    }
+  </script>
 </head>
 
 <body></body>

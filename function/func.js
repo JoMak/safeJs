@@ -1,5 +1,7 @@
 /**
- * File: func.js
+ * @file: func.js
+ * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
+ * @version: 1.0.0
  */
 (function() {
   "use strict";
@@ -19,12 +21,23 @@
     }
   };
 
+  var checkType = function func_checkTypes(paramMap, index) {
+    if (!paramMap[0].isValidType(paramMap[1])) {
+      var typesStr = paramMap[0]._types.join(', ');
+      throw new TypeError('Invalid type for parameter "' + (paramMap[2] || index) + '":\n' +
+      'Expected type(s): ' + typesStr + '\n' +
+      'Found type: ' + typeof(paramMap[1]));
+    }
+  };
+
   /**
    * @param  {Object} params Descriptions of the types of all of the parameters within the method
    * (or just the parameters you would like checked)
-   * @param  {function} method The method whose parameters will be checked
+   * @param  {Object} method The method whose parameters will be checked
    * @return {function} a wrapped method of the function passed in that does
    * type checking of all of the parameter definitions passed in.
+   *
+   * @since 1.0.0
    */
   var func = function func(params, method) {
     if (!_.isObject(params)) {
@@ -36,11 +49,8 @@
       var args = _.toArray(arguments);
       args.shift();
 
-      _.zip(paramDefns, args, _.keys(params)).forEach(function(paramMap, index) {
-        if (!paramMap[0].isValidType(paramMap[1])) {
-          throw new TypeError('Parameter "' + (paramMap[2] || index) + '" must have types: ' + paramMap[0]._types);
-        }
-      });
+      //check parameters for types
+      _.zip(paramDefns, args, _.keys(params)).forEach(checkType);
 
       origMethod.apply(this, args);
     });
