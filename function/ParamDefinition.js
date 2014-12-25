@@ -4,7 +4,11 @@
 (function() {
   "use strict";
 
-  var ParamDefinition = function ParamDefintion_constructor(settings) {
+  /**
+   * ParamDefinition constructor
+   * @param {Object} settings default values
+   */
+  var ParamDefinition = function ParamDefintion(settings) {
     this.addProperties(settings);
   };
 
@@ -57,9 +61,7 @@
 
     /**
      * [Optional] Allow a parameter to be empty
-     * For string this will be an empty string ('') check,
-     * For Arrays this will check the 'length' property
-     * The property is not checked for any other type
+     * An 'empty' object is one defined by underscorejs' `_.isEmpty` method
      * Defaults to 'true'
      */
     'allowEmpty': {
@@ -80,7 +82,7 @@
 
     /**
      * [Optional] Valid types the parameter is allowed to be.
-     * Defaults to 'object'
+     * Defaults to '*'
      */
     'paramTypes': {
       configurable: false,
@@ -106,7 +108,7 @@
             }
           });
         } catch (err) {
-          console.error('Could not set "paramType":', types);
+          this.log('error', 'Could not set "paramType":', types);
           throw err;
         }
 
@@ -132,6 +134,13 @@
 
         this._pos = pos;
       }
+    },
+
+    'name': {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: 'ParamDefinition'
     },
 
     /**
@@ -201,6 +210,10 @@
     }
   });
 
+  ParamDefinition.toString = function ParamDefinition_toString() {
+    return this.prototype.name;
+  };
+
   /**
    * Add all properties/settings for a ParamDefition in batch
    * @param {Object | string | Array} settings
@@ -228,7 +241,7 @@
       try {
         this[key] = value;
       } catch (err) {
-        console.error('Could not add key: "' + key + '": ' + err.toString());
+        this.log('error', 'Could not add key: "' + key + '": ' + err.toString());
         // throw ('Could not add key: "' + key + '": ' + err.toString());
       }
     }
@@ -250,7 +263,7 @@
     //check for types now
     return this._types.some(function(type) {
       if (_.isString(type)) {
-        return checkStringType(type, value);
+        return ParamDefinition.checkStringType(type, value);
 
       } else {
         return (value instanceof type);
@@ -259,7 +272,11 @@
 
   };
 
-  var checkStringType = function ParamDefinition_checkStringType(type, value) {
+  ParamDefinition.checkStringType = function ParamDefinition_checkStringType(type, value) {
+    if (type === '*') {
+      return true;
+    }
+
     switch (type.toLowerCase()) {
 
       case 'element':
@@ -301,7 +318,7 @@
         return _.isRegExp(value);
 
       default:
-        console.error('Error: unknown param type: ' + type);
+        this.protoype.log('error', 'Error: unknown param type: ' + type);
         return false;
     }
   };
