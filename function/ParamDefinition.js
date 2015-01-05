@@ -317,10 +317,12 @@
         return _.isElement(value);
 
       case 'array':
+      case '[]':
         return _.isArray(value);
 
       case 'object':
       case 'obj':
+      case '{}':
         return _.isObject(value);
 
       case 'arguments':
@@ -330,6 +332,7 @@
         return _.isArguments(value);
 
       case 'function':
+      case 'method':
         return _.isFunction(value);
 
       case 'string':

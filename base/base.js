@@ -39,7 +39,9 @@
           throw new TypeError('Property "enableLogging" must be of type: "boolean"');
         }
 
-        this._isLogging = enable;
+        if (!_.isNull(window.console)) {
+          this._isLogging = enable;
+        }
       },
     },
 
@@ -75,7 +77,26 @@
 
   Base.prototype.log = function Base_log(level) {
     if (this.enableLogging) {
-      console[level || 'log'].apply(Array.prototype.slice.call(arguments, 1));
+      switch (level.toLowerCase()) {
+        case 'info':
+          console.info.apply(null, Array.prototype.slice.call(arguments, 1));
+          break;
+
+        case 'warn':
+        case 'warning':
+          console.warn.apply(null, Array.prototype.slice.call(arguments, 1));
+          break;
+
+        case 'alert':
+        case 'error':
+        case 'err':
+          console.error.apply(null, Array.prototype.slice.call(arguments, 1));
+          break;
+
+        default:
+          console.log.apply(null, Array.prototype.slice.call(arguments, 1));
+          break;
+      }
     }
   };
 

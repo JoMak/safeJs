@@ -25,8 +25,8 @@
     if (!paramMap[0].isValidType(paramMap[1])) {
       var typesStr = paramMap[0]._types.join(', ');
       throw new TypeError('Invalid type for parameter "' + (paramMap[2] || index) + '":\n' +
-      'Expected type(s): ' + typesStr + '\n' +
-      'Found type: ' + typeof(paramMap[1]));
+        'Expected type(s): ' + typesStr + '\n' +
+        'Found type: ' + typeof(paramMap[1]));
     }
   };
 
@@ -41,7 +41,7 @@
    */
   var func = function func(params, method) {
     if (!_.isObject(params)) {
-      throw new TypeError('Parameter defintions must be of type: "Object"');
+      throw new TypeError('Parameter definitions must be of type: "Object"');
     }
 
     var paramDefns = _.chain(params).values().map(getParamDefintion).value();
