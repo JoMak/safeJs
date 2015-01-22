@@ -1,0 +1,34 @@
+{
+  "name": "safeJs",
+  "version": "1.0.0",
+  "homepage": "https://github.com/KarimP/safeJs",
+  "authors": [
+    "Karim Piyar Ali <karim.piyarali@gmail.com>"
+  ],
+  "main": "sjs.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "js",
+    "type",
+    "checking",
+    "typecheck"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "sinon": "~1.12.2",
+    "mocha": "~2.1.0",
+    "chai": "~1.10.0"
+  },
+  "dependencies": {
+    "underscore": "~1.7.0"
+  }
+}
