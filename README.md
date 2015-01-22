@@ -16,7 +16,7 @@ An instance of a `ParameterDefiniton` object or an object that contains properti
 Note that if there are only `n` parameter types/definitions specified, then only the first `n` parameters of the function will be checked. Also (for now) the parameter definitions must be placed in the order the parameters occur in the function.
 
 ####Example
-	sjs.func({
+	var myFunction = sjs.func({
 		param1: {
 			types: ["string", "number", MyCustomObject],
 			allowEmpty: false,
@@ -28,6 +28,17 @@ Note that if there are only `n` parameter types/definitions specified, then only
 		console.log ('I ran!', param1, param2, param3);
 	});
 
+	//throws error:
+	myFunction({}, 4, 'a string');
+
+	//will run
+	myFunction(4, 'a string', document.createElement('div'));
+
 ####Roadmap
 * Ideally, the `func` method should allow parameter definitions for an infinite set of parameters (i.e. defining a parameter definition for all parameters after the third parameter).
 * The `func` method should also allow parameter definitions to not be placed in the order the parameters occuring in the function (i.e. by specifying a `pos` property to specify a postion)
+
+##Running
+Don't have any build tools like Grunt set up yet, so I recommend running `bower install` first to get all dependencies required for the library, and then looking at the order of the script imports in the `tests/test.html` file.
+
+Eventually I'll set of a Gruntfile.	
