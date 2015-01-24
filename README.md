@@ -41,4 +41,4 @@ Note that if there are only `n` parameter types/definitions specified, then only
 ##Running
 Don't have any build tools like Grunt set up yet, so I recommend running `bower install` first to get all dependencies required for the library, and then looking at the order of the script imports in the `tests/test.html` file.
 
-Eventually I'll set of a Gruntfile.	
+Eventually I'll setup a Gruntfile.	
