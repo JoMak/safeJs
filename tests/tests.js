@@ -18,8 +18,7 @@
 		});
 
 	    it('Test logging level: log', function() {
-
-
+	    	expect(0 === 0).to.be.true;
 	    });
 
 	    after(function() {

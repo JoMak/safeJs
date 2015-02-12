@@ -24,7 +24,7 @@
     "tests"
   ],
   "devDependencies": {
-    "sinon": "~1.12.2",
+    "sinon": "http://sinonjs.org/releases/sinon-1.12.2.js",
     "mocha": "~2.1.0",
     "chai": "~1.10.0"
   },
