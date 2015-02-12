@@ -241,25 +241,25 @@
   };
 
   /**
-   * Add all properties/settings for a ParamDefition in batch
+   * Add all properties/settings for a ParamDefinition in batch
    * @param {Object | string | Array} settings
    */
   ParamDefinition.prototype.addProperties = function ParamDefinition_addProperties(settings) {
-    if (_.isObject(settings)) {
+    if (_.isString(settings) || _.isArray(settings)) {
+      this.addProperty('paramTypes', settings);
+
+    } else if (_.isObject(settings)) {
       this.addProperty('allowNull', settings.allowNull);
       this.addProperty('allowEmpty', settings.allowEmpty);
       this.addProperty('allowUndefined', settings.allowUndefined);
       this.addProperty('paramTypes', settings.types);
       this.addProperty('pos', settings.pos);
-
-    } else if (_.isString(settings) || _.isArray(settings)) {
-      this.addProperty('paramTypes', settings);
-    }
+    } 
   };
 
   /**
    * Simple undefined/null checker before adding a property
-   * @param {string} key A valid ParamDefintion property (this will NOT be checked for validity)
+   * @param {string} key A valid ParamDefinition property (this will NOT be checked for validity)
    * @param {*} value Property value - this gets checked for undefined and null
    */
   ParamDefinition.prototype.addProperty = function ParamDefinition_addProperty(key, value) {
@@ -288,7 +288,7 @@
 
     //check for types now
     return this._types.some(function(type) {
-      if (_.isString(type)) {
+      if (_.isString(type)) { 
         return ParamDefinition.checkStringType(type, value);
 
       } else {

@@ -24,27 +24,32 @@
   var checkType = function func_checkTypes(paramMap, index) {
     if (!paramMap[0].isValidType(paramMap[1])) {
       var typesStr = paramMap[0]._types.join(', ');
-      throw new TypeError('Invalid type for parameter "' + (paramMap[2] || index) + '":\n' +
-        'Expected type(s): ' + typesStr + '\n' +
-        'Found type: ' + typeof(paramMap[1]));
+      throw new TypeError('Invalid type for parameter "' + (paramMap[2] || index) + '": ' +
+        'Expected type(s):' + typesStr +
+        ' Found type:' + typeof(paramMap[1]));
     }
   };
 
   /**
-   * @param  {Object} params Descriptions of the types of all of the parameters within the method
+   * @param  {Object | Object[]} params Descriptions of the types of all of the parameters within the method
    * (or just the parameters you would like checked)
-   * @param  {Object} method The method whose parameters will be checked
+   * @param  {function} method The method whose parameters will be checked
    * @return {function} a wrapped method of the function passed in that does
    * type checking of all of the parameter definitions passed in.
    *
    * @since 1.0.0
    */
-  var func = function func(params, method) {
+  var func = function func(params, method, context) {
     if (!_.isObject(params)) {
-      throw new TypeError('Parameter definitions must be of type: "Object"');
+      throw new TypeError('Parameter definitions must be of type: "Object" or "Array"');
+    }
+
+    if (!_.isObject(context)) {
+      context = null;
     }
 
     var paramDefns = _.chain(params).values().map(getParamDefintion).value();
+
     return _.wrap(method, function(origMethod) {
       var args = _.toArray(arguments);
       args.shift();
@@ -52,7 +57,7 @@
       //check parameters for types
       _.zip(paramDefns, args, _.keys(params)).forEach(checkType);
 
-      origMethod.apply(this, args);
+      origMethod.apply(context, args);
     });
   };
 

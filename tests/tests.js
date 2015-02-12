@@ -1,9 +1,12 @@
-// var expect = chai.expect;
+(function() {
+	"use strict";
+	// var expect = chai.expect;
 
-describe('TODO', function() {
-    'use strict';
+	describe('Base.js Test', function() {
 
-    it('TODO', function() {
+	    it('Test logging', function() {
 
-    });
-});
+	    });
+	});
+
+})();
