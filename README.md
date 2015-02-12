@@ -56,6 +56,6 @@ The tradeoff with this method is that the error messages will only provide the i
 * The `func` method should also allow parameter definitions to not be placed in the order the parameters occuring in the function (i.e. by specifying a `pos` property to specify a postion)
 
 ##Running
-Don't have any build tools like Grunt set up yet, so I recommend running `bower install` first to get all dependencies required for the library, and then looking at the order of the script imports in the `tests/test.html` file.
+Don't have any build tools like Grunt or Gulp set up for this project yet, so I recommend running `bower install` first to get all dependencies required for the library, and then looking at the order of the script imports in the `tests/test.html` file.
 
-Eventually I'll setup a Gruntfile.	
+Eventually I'll setup a build script. Ideally, I'd like to provide as much customization as possible to create custom 'sjs' libraries that only have the modules each user would like and wish to use.
