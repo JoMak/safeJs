@@ -14,11 +14,39 @@
     //empty
   };
 
+  Base.toString = function Base_toString() {
+    return this.prototype.name;
+  };
+
+  Base.prototype.log = function Base_log(level) {
+    if (this.enableLogging) {
+      switch (level.toLowerCase()) {
+        case 'info':
+          console.info.apply(console, Array.prototype.slice.call(arguments, 1));
+          break;
+
+        case 'warn':
+        case 'warning':
+          console.warn.apply(console, Array.prototype.slice.call(arguments, 1));
+          break;
+
+        case 'alert':
+        case 'error':
+        case 'err':
+          console.error.apply(console, Array.prototype.slice.call(arguments, 1));
+          break;
+
+        default:
+          console.log.apply(console, Array.prototype.slice.call(arguments, 1));
+          break;
+      }
+    }
+  };
+
   Object.defineProperties(Base.prototype, {
     /**
      * Properties
      */
-
     'name': {
       enumerable: false,
       configurable: false,
@@ -63,42 +91,36 @@
     'log': {
       enumerable: false,
       configurable: false,
-      writable: true
+      writable: false
     }
   });
 
-  Base.toString = function Base_toString() {
-    return this.prototype.name;
-  };
+  Object.defineProperties(Base, {
+    /*
+    Properties
+     */
+    'enableLogging': {
+      enumerable: false,
+      configurable: false,
+      get: function Base_enableLogging_get() {
+        return this.prototype.enableLogging;
+      },
 
-  Base.enableLogging = function Base_setEnableLogging(enable) {
-    Base.prototype.enableLogging = enable;
-  };
-
-  Base.prototype.log = function Base_log(level) {
-    if (this.enableLogging) {
-      switch (level.toLowerCase()) {
-        case 'info':
-          console.info.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
-
-        case 'warn':
-        case 'warning':
-          console.warn.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
-
-        case 'alert':
-        case 'error':
-        case 'err':
-          console.error.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
-
-        default:
-          console.log.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
+      set: function Base_enableLogging_set(enable) {
+        this.prototype.enableLogging = enable;
       }
+    },
+
+    /*
+    Methods
+     */
+    
+    'toString': {
+      enumerable: false,
+      configurable: false,
+      writable: false
     }
-  };
+  });
 
   window.sjs.Base = Base;
 

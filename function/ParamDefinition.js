@@ -359,5 +359,10 @@
     }
   };
 
-  window.sjs.ParamDefinition = ParamDefinition;
+  Object.defineProperty(sjs, 'ParamDefinition', {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+    value: ParamDefinition
+  });
 })();
