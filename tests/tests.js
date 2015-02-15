@@ -83,9 +83,9 @@
 	    	base.enableLogging = false;
 
 	    	sjs.enableLogging = true;
-	    	base.log('log', 'test'); //this should log
+	    	base.log('log', 'test'); //this should not log
 	    	paramDef.log('log', 'test'); //this should log
-	    	consoleCount.log += 2;
+	    	consoleCount.log++;
 
 	    	expect(console.log.callCount, 'check with log count').to.equal(consoleCount.log);
 

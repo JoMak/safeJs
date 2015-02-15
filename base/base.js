@@ -15,49 +15,58 @@
   };
 
   Base.toString = function Base_toString() {
-    return this.prototype.name;
+    return 'Base';
   };
+
+  Base.prototype._isLogging = true;
 
   Base.prototype.log = function Base_log(level) {
     if (this.enableLogging) {
-      switch (level.toLowerCase()) {
-        case 'info':
-          console.info.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
+      if (console[level]) {
+        console[level].apply(console, Array.prototype.slice.call(arguments, 1));
 
-        case 'warn':
-        case 'warning':
-          console.warn.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
-
-        case 'alert':
-        case 'error':
-        case 'err':
-          console.error.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
-
-        default:
-          console.log.apply(console, Array.prototype.slice.call(arguments, 1));
-          break;
+      } else {
+        console.log.apply(console, Array.prototype.slice.call(arguments, 1));
       }
     }
   };
 
-  Object.defineProperties(Base.prototype, {
-    /**
-     * Properties
+  window.sjs.Base = Base;
+
+  window.sjs.enableLogging = function sjs_enableLogging(enable) {
+    window.sjs.Base.enableLogging(enable);
+  };
+
+  //property descriptors
+  Object.defineProperties(Base, {
+    /*
+    Accessor descriptors
      */
-    'name': {
-      enumerable: false,
-      configurable: false,
-      writable: false,
-      value: 'Base'
+    'enableLogging': {
+      get: function Base_enableLogging_get() {
+        return this.prototype.enableLogging;
+      },
+
+      set: function Base_enableLogging_set(enable) {
+        this.prototype.enableLogging = enable;
+      }
     },
 
-    'enableLogging': {
-      enumerable: false,
-      configurable: false,
+    /*
+    Data descriptors
+     */
+    
+    'toString': {
+      writable: false
+    }
+  });
 
+  Object.defineProperties(Base.prototype, {
+    /*
+     * Accessor descriptors
+     */
+    
+    'enableLogging': {
       get: function Base_enableLogging_get() {
         return this._isLogging;
       },
@@ -73,59 +82,38 @@
       },
     },
 
-    /**
-     * Fields
+    /*
+     * Data descriptors
      */
 
     '_isLogging': {
-      enumerable: false,
-      configurable: false,
-      writable: true,
-      value: true
+      writable: true
     },
-
-    /**
-     * Methods
-     */
 
     'log': {
-      enumerable: false,
-      configurable: false,
       writable: false
     }
   });
 
-  Object.defineProperties(Base, {
-    /*
-    Properties
-     */
-    'enableLogging': {
-      enumerable: false,
-      configurable: false,
-      get: function Base_enableLogging_get() {
-        return this.prototype.enableLogging;
-      },
+  Object.defineProperties(sjs, {
+  	/*
+  	Accessor descriptors
+  	 */
+  	'enableLogging': {
+  		get: function sjs_enableLogging_get() {
+  			return this.Base.enableLogging;
+  		},
 
-      set: function Base_enableLogging_set(enable) {
-        this.prototype.enableLogging = enable;
-      }
-    },
+  		set: function sjs_enableLogging_set(enable) {
+  			this.Base.enableLogging = enable;
+  		}
+  	},
 
-    /*
-    Methods
-     */
-    
-    'toString': {
-      enumerable: false,
-      configurable: false,
+  	/*
+  	Data descriptors
+  	 */
+  	'Base': {
       writable: false
     }
   });
-
-  window.sjs.Base = Base;
-
-  window.sjs.enableLogging = function sjs_enableLogging(enable) {
-    window.sjs.Base.enableLogging(enable);
-  };
-
 })();

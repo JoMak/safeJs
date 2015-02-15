@@ -14,11 +14,7 @@
    * @returns {ParamDefinition}
    */
   var getParamDefintion = function func_getParamDefinition(param) {
-    if (param instanceof ParamDefinition) {
-      return param;
-    } else {
-      return new ParamDefinition(param);
-    }
+    return (param instanceof ParamDefinition) ? param : new ParamDefinition(param);
   };
 
   var checkType = function func_checkTypes(paramMap, index) {
@@ -62,4 +58,6 @@
   };
 
   window.sjs.func = func;
+
+  Object.defineProperty(window.sjs, 'func', { writable: false });
 })();
