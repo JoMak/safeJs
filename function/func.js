@@ -13,17 +13,16 @@
    * @param {Object | string | Array | ParamDefinition} param
    * @returns {ParamDefinition}
    */
-  var getParamDefintion = function func_getParamDefinition(param) {
-    return (param instanceof ParamDefinition) ? param : new ParamDefinition(param);
+  var getParamDefintion = function func_getParamDefinition(paramDef, paramName) { 
+    if (!(paramDef instanceof ParamDefinition)) {
+      paramDef = new ParamDefinition(paramDef);
+    }
+    paramDef.name = paramName;
+    return paramDef;
   };
 
-  var checkType = function func_checkTypes(paramMap, index) {
-    if (!paramMap[0].isValidType(paramMap[1])) {
-      var typesStr = paramMap[0]._types.join(', ');
-      throw new TypeError('Invalid type for parameter "' + (paramMap[2] || index) + '": ' +
-        'Expected type(s):' + typesStr +
-        ' Found type:' + typeof(paramMap[1]));
-    }
+  var checkType = function func_checkType(paramDef) {
+    paramDef[0].isValidWith(paramDef[1]);
   };
 
   /**
@@ -44,14 +43,14 @@
       context = null;
     }
 
-    var paramDefns = _.chain(params).values().map(getParamDefintion).value();
+    var paramDefns = _.map(params, getParamDefintion);
 
     return _.wrap(method, function(origMethod) {
       var args = _.toArray(arguments);
       args.shift();
 
       //check parameters for types
-      _.zip(paramDefns, args, _.keys(params)).forEach(checkType);
+      _.zip(paramDefns, args).forEach(checkType);
 
       origMethod.apply(context, args);
     });

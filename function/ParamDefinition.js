@@ -16,6 +16,11 @@
    */
   var ParamDefinition = function ParamDefintion(settings) {
     this._super.apply(this, null);
+    
+    if (_.isString(settings) || _.isArray(settings)) {
+      settings = { types: settings };
+    }
+
     this.addProperties(settings);
   };
 
@@ -31,30 +36,7 @@
   ParamDefinition.prototype._allowUndefined = false;
   ParamDefinition.prototype._allowEmpty = true;
   ParamDefinition.prototype._types = ['object'];
-  ParamDefinition.prototype._pos = NaN;  
-
-  /**
-   * Tries to add properties/settings for a ParamDefinition in batch
-   * @param {Object | string | Array} settings object containing ParamDefinition properties
-   */
-  ParamDefinition.prototype.addProperties = function ParamDefinition_addProperties(settings) {
-    if (_.isString(settings) || _.isArray(settings)) {
-      this.addProperty('types', settings);
-
-    } else if (_.isObject(settings)) {
-
-      for (var prop in settings) {
-        if (this[prop]) {
-          try {
-            this[prop] = settings[prop];
-          } catch (err) {
-            this.log('error', 'Could not add key: "' + key + '": ' + err.toString());
-            // throw ('Could not add key: "' + key + '": ' + err.toString());
-          }
-        }
-      }
-    } 
-  };
+  ParamDefinition.prototype._pos = NaN;
 
   /**
    * Check if the passed in object/value matches the parameter definition
@@ -63,38 +45,56 @@
    */
   ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
     //check for undefined, null, and empty first
-    if (!this._allowUndefined && _.isUndefined(value)) {
-      throw new TypeError('Parameter ' + this.name + ' cannot be undefined');
+    if (_.isUndefined(value)) {
+      if (!this._allowUndefined) {
+        throw new TypeError('Parameter ' + this.name + ' cannot be undefined');
+      }
+      return;
     }
 
-    if (!this._allowNull && _.isNull(value)) {
-      throw new TypeError('Parameter ' + this.name + ' cannot be null');
-    }
-    
-    if (!this._allowEmpty && _.isEmpty(value)) {
-      throw new TypeError('Parameter ' + this.name + ' cannot be empty');
+    if (_.isNull(value)) {
+      if (!this._allowNull) {
+        throw new TypeError('Parameter ' + this.name + ' cannot be null');
+      }
+      return;
     }
 
     //check for types now
     
-    this._types.forEach(function(type) {
-      type = type.toLowerCase();
-      var isCheck = 'is' + type[0].toUpperCase() + type.substring(1);
-
-      if ( (type !== '*') && (
-        (!(_.isString(type) || (value instanceof type))) || 
-        (_[isCheck] && !_[isCheck](value)))) {
-
-        throw new TypeError('Invalid type for parameter ' + this.name +
-          ': Expected type(s):' + this.types +
-          ' Found type:' + typeof(value));
+    var validType = this._types.some(function(type) {
+      if (type === '*') {
+        return true;
       }
-      
+
+      if (_.isString(type)) {
+        type = type.toLowerCase();
+        var isCheck = 'is' + type[0].toUpperCase() + type.substring(1);
+        if (_[isCheck]){
+          return _[isCheck](value);
+        }
+
+      } else {
+        return (value instanceof type);
+      }
+
+      return false;      
     }, this);
+
+    if (!validType) {
+      throw new TypeError('Invalid type for parameter ' + this.name +
+          ': Expected type(s): ' + this.types +
+          ' Found type: ' + typeof(value));
+    }
+
+    //check for empty
+    if (!this._allowEmpty && _.isEmpty(value)) {
+      throw new TypeError('Parameter ' + this.name + ' cannot be empty');
+    }
   };
 
   window.sjs.ParamDefinition = ParamDefinition;
 
+  //property definitions
   Object.defineProperties(ParamDefinition.prototype, {
     /**
      * [Optional] Allow a parameter to be null
@@ -205,7 +205,7 @@
      */
     'name': {
       get: function ParamDefinition_name_get() {
-        return this.name || '';
+        return this._name || '';
       },
 
       set: function ParamDefinition_name_set(name) {
@@ -226,22 +226,10 @@
     },
 
     '_name': {
-      writable: false
+      writable: true
     },
 
-    'addProperties': {
-      writable: false
-    },
-
-    'addProperty': {
-      writable: false
-    },
-
-    'setDefaults': {
-      writable: false
-    },
-
-    'isValidType': {
+    'isValidWith': {
       writable: false
     },
 

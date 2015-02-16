@@ -31,6 +31,25 @@
     }
   };
 
+  /**
+   * Tries to add properties/settings for an object's instance in batch
+   * @param {Object | string | Array} props object containing instance's properties
+   */
+  Base.prototype.addProperties = function Base_addProperties(props) {
+    if (_.isObject(props)) {
+      for (var prop in props) {
+        if (!_.isUndefined(this[prop])) {
+          try {
+            this[prop] = props[prop];
+          } catch (err) {
+            this.log('error', 'Could not add key: "' + key + '": ' + err.toString());
+            // throw ('Could not add key: "' + key + '": ' + err.toString());
+          }
+        }
+      }
+    }
+  };
+
   window.sjs.Base = Base;
 
   window.sjs.enableLogging = function sjs_enableLogging(enable) {
@@ -91,6 +110,10 @@
     },
 
     'log': {
+      writable: false
+    },
+
+    'addProperties': {
       writable: false
     }
   });
