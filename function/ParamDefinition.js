@@ -3,16 +3,23 @@
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
  * @version: 1.0.0
  */
+
 (function() {
   "use strict";
 
   var Base = window.sjs.Base;
 
   /**
-   * ParamDefinition constructor
+   * Defines the properties of a parameter,
+   * specifically if the types they are allowed to be,
+   * their positions, names as well as whether they are allowed be empty, null or undefined
+   * 
+   * @param {?(Object|Array|string)} settings default values for the ParamDefinition object
+   * It can either be an object containing the properites of the object or an array of objects
+   * or string (or a mix of objects or strings) describing the allowed types of the parameter
+   * 
    * @constructor
-   * @param {Object} settings default values
-   * @since 1.0.0
+   * @memberof sjs
    */
   var ParamDefinition = function ParamDefintion(settings) {
     this._super.apply(this, null);
@@ -29,38 +36,88 @@
   };
 
   ParamDefinition.prototype = Object.create(Base.prototype);
+
   ParamDefinition.prototype.constructor = ParamDefinition;
+
   ParamDefinition.prototype._super = Base;
-  ParamDefinition.prototype._name = '';
-  ParamDefinition.prototype._allowNull = false;
+
+  ParamDefinition.prototype.name = 'ParamDefinition';
+
+  ParamDefinition.prototype._paramName = '';
+
   ParamDefinition.prototype._allowUndefined = false;
+
+  ParamDefinition.prototype._allowNull = false;  
+
   ParamDefinition.prototype._allowEmpty = true;
+
   ParamDefinition.prototype._types = ['object'];
+
   ParamDefinition.prototype._pos = NaN;
 
   /**
+   * Allow the parameter to be undefined
+   * @type {boolean} [allowUndefined=false]
+   */
+  ParamDefinition.prototype.allowUndefined = false;
+
+  /**
+   * Allow the parameter to be null
+   * @type {boolean} [allowNull=false]
+   */
+  ParamDefinition.prototype.allowNull = false;
+
+  /**
+   * Allow the parameter to be empty
+   * An 'empty' object is one defined by underscorejs' `_.isEmpty` method
+   * @type {boolean} [allowEmpty=true]
+   */
+  ParamDefinition.prototype.allowEmpty = true;
+
+  /**
+   * Valid types the parameter is allowed to be
+   * @type {!Array<string, object>} [types=['object']]
+   */
+  ParamDefinition.prototype.types = ['object'];
+
+  /**
+   * The position of a parameter in the method
+   * @type {number} [pos=NaN]
+   */
+  ParamDefinition.prototype.pos = NaN;
+
+  /**
+   * Name of the parameter
+   * @type {string} [paramName='']
+   */
+  ParamDefinition.prototype.paramName = '';
+
+  /**
    * Check if the passed in object/value matches the parameter definition
-   * @param {*} value Value or object to check the parameter types and restrictions against
-   * @return {Boolean}
+   * 
+   * @param {*} value Value to check the parameter types and restrictions against
+   * @return {Boolean} True if the value given matches the parameter definition, 
+   *                        throws can error otherwise
+   * @throws {TypeError} If the value given is does not match the parameter definition
    */
   ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
+
     //check for undefined, null, and empty first
     if (_.isUndefined(value)) {
       if (!this._allowUndefined) {
-        throw new TypeError('Parameter ' + this.name + ' cannot be undefined');
+        throw new TypeError('Parameter ' + this.paramName + ' cannot be undefined');
       }
       return;
     }
 
     if (_.isNull(value)) {
       if (!this._allowNull) {
-        throw new TypeError('Parameter ' + this.name + ' cannot be null');
+        throw new TypeError('Parameter ' + this.paramName + ' cannot be null');
       }
       return;
     }
 
     //check for types now
-    
     var validType = this._types.some(function(type) {
       if (type === '*') {
         return true;
@@ -81,46 +138,26 @@
     }, this);
 
     if (!validType) {
-      throw new TypeError('Invalid type for parameter ' + this.name +
+      throw new TypeError('Invalid type for parameter ' + this.paramName +
           ': Expected type(s): ' + this.types +
           ' Found type: ' + typeof(value));
     }
 
     //check for empty
     if (!this._allowEmpty && _.isEmpty(value)) {
-      throw new TypeError('Parameter ' + this.name + ' cannot be empty');
+      throw new TypeError('Parameter ' + this.paramName + ' cannot be empty');
     }
+
+    return true;
   };
 
   window.sjs.ParamDefinition = ParamDefinition;
 
   //property definitions
   Object.defineProperties(ParamDefinition.prototype, {
-    /**
-     * [Optional] Allow a parameter to be null
-     * Defaults to 'false'
-     */
-    'allowNull': {
-      get: function ParamDefinition_allowNull_get() {
-        return this._allowNull ||  false;
-      },
-
-      set: function ParamDefinition_allowNull_set(allowNull) {
-        if (!_.isBoolean(allowNull)) {
-          throw new TypeError('Property "allowNull" must be of type: "boolean"');
-        }
-
-        this._allowNull = allowNull;
-      }
-    },
-
-    /**
-     * [Optional] Allow a parameter to be undefined
-     * Defaults to 'false'
-     */
     'allowUndefined': {
       get: function ParamDefinition_allowUndefined_get() {
-        return this._allowUndefined || false;
+        return this._allowUndefined;
       },
 
       set: function ParamDefinition_allowUndefined_set(allowUndefined) {
@@ -132,14 +169,23 @@
       }
     },
 
-    /**
-     * [Optional] Allow a parameter to be empty
-     * An 'empty' object is one defined by underscorejs' `_.isEmpty` method
-     * Defaults to 'true'
-     */
+    'allowNull': {
+      get: function ParamDefinition_allowNull_get() {
+        return this._allowNull;
+      },
+
+      set: function ParamDefinition_allowNull_set(allowNull) {
+        if (!_.isBoolean(allowNull)) {
+          throw new TypeError('Property "allowNull" must be of type: "boolean"');
+        }
+
+        this._allowNull = allowNull;
+      }
+    },    
+
     'allowEmpty': {
       get: function ParamDefinition_allowEmpty_get() {
-        return this._allowEmpty || true;
+        return this._allowEmpty;
       },
 
       set: function ParamDefinition_allowEmpty_set(allowEmpty) {
@@ -150,10 +196,6 @@
       }
     },
 
-    /**
-     * [Optional] Valid types the parameter is allowed to be.
-     * Defaults to '*'
-     */
     'types': {
       get: function ParamDefinition_types_get() {
         return this._types || ['object'];
@@ -183,9 +225,6 @@
       }
     },
 
-    /**
-     * [Optional] The position of a parameter in the method.
-     */
     'pos': {
       get: function ParamDefinition_pos_get() {
         return this._pos || NaN;
@@ -200,58 +239,31 @@
       }
     },
 
-    /**
-     * [Optional] The name of the parameter.
-     */
-    'name': {
-      get: function ParamDefinition_name_get() {
-        return this._name || '';
+    'paramName': {
+      get: function ParamDefinition_paramName_get() {
+        return this._paramName || '';
       },
 
-      set: function ParamDefinition_name_set(name) {
+      set: function ParamDefinition_paramName_set(paramName) {
         if (!_.isString(name)) {
           throw new TypeError('Property "name" must be of type: "string"');
         }
 
-        this._name = name;
+        this._paramName = paramName;
       }
     },
 
-    'constructor': {
-      writable: false
-    },
+    'constructor': { writable: false },
+    '_super': { writable: false },
+    'name': { writable: true },
+    'isValidWith': { writable: false },
 
-    '_super': {
-      writable: false
-    },
-
-    '_name': {
-      writable: true
-    },
-
-    'isValidWith': {
-      writable: false
-    },
-
-    '_allowNull': {
-      writable: true
-    },
-
-    '_allowEmpty': {
-      writable: true
-    },
-
-    '_allowUndefined': {
-      writable: true
-    },
-
-    '_types': {
-      writable: true
-    },
-
-    '_pos': {
-      writable: true
-    }
+    '_paramName': { writable: true },
+    '_allowNull': { writable: true },
+    '_allowEmpty': { writable: true },
+    '_allowUndefined': { writable: true },
+    '_types': { writable: true },
+    '_pos': { writable: true }    
   });
 
   Object.defineProperty(window.sjs, 'ParamDefinition', { writable: false });

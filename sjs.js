@@ -8,8 +8,7 @@
 
   /**
    * Main safeJs object
-   * @namespace
-   * @type {Object}
+   * @namespace {Object} sjs
    * @since 1.0.0
    */
   var sjs = {};

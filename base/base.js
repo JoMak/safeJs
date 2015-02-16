@@ -3,37 +3,53 @@
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
  * @version: 1.0.0
  */
+
 (function() {
   "use strict";
 
   /**
+   * Base object which all other objects (with constructors) will inherit from.
+   * 
    * @constructor
-   * @since 1.0.0
+   * @memberof sjs
    */
-  var Base = function Base() {
-    //empty
-  };
+  var Base = function Base() { };
 
   Base.toString = function Base_toString() {
-    return 'Base';
+    return this.name;
   };
 
   Base.prototype._isLogging = true;
 
+  Base.prototype.name = 'Base';
+
+  /**
+   * Enable or disable logging for this instance
+   * @type {boolean} [enableLogging=true]
+   */
+  Base.prototype.enableLogging = true;
+
+  /**
+   * A wrapper for logging something related to that object
+   * Will not log if logging is disabled
+   * @param {String} level Level of log (i.e. 'log', 'error', 'warn', 'info')
+   * @param {...*} message Message to log
+   */
   Base.prototype.log = function Base_log(level) {
     if (this.enableLogging) {
-      if (console[level]) {
-        console[level].apply(console, Array.prototype.slice.call(arguments, 1));
+      var messages = ['['+ this.toString() + ']'].concat(_.toArray(arguments).slice(1));
 
+      if (console[level]) {
+        console[level].apply(console, messages);
       } else {
-        console.log.apply(console, Array.prototype.slice.call(arguments, 1));
+        console.log.apply(console, messages);
       }
     }
   };
 
   /**
    * Tries to add properties/settings for an object's instance in batch
-   * @param {Object | string | Array} props object containing instance's properties
+   * @param {!Object} props object containing instance's properties
    */
   Base.prototype.addProperties = function Base_addProperties(props) {
     if (_.isObject(props)) {
@@ -52,15 +68,15 @@
 
   window.sjs.Base = Base;
 
-  window.sjs.enableLogging = function sjs_enableLogging(enable) {
-    window.sjs.Base.enableLogging(enable);
-  };
+  /**
+   * enable or disable logging *globally* with all isntances of objects inherited from Base
+   * Note: this *does not* disable logging from intances which have set enable logging themselves
+   * @type {boolean} [enableLogging=true]
+   */
+  window.sjs.enableLogging = true;
 
   //property descriptors
   Object.defineProperties(Base, {
-    /*
-    Accessor descriptors
-     */
     'enableLogging': {
       get: function Base_enableLogging_get() {
         return this.prototype.enableLogging;
@@ -70,21 +86,13 @@
         this.prototype.enableLogging = enable;
       }
     },
-
-    /*
-    Data descriptors
-     */
     
     'toString': {
       writable: false
     }
   });
 
-  Object.defineProperties(Base.prototype, {
-    /*
-     * Accessor descriptors
-     */
-    
+  Object.defineProperties(Base.prototype, {    
     'enableLogging': {
       get: function Base_enableLogging_get() {
         return this._isLogging;
@@ -99,29 +107,16 @@
           this._isLogging = enable;
         }
       },
-    },
+    },    
 
-    /*
-     * Data descriptors
-     */
+    'name': { writable: true },
+    'log': { writable: false },
+    'addProperties': { writable: false },
 
-    '_isLogging': {
-      writable: true
-    },
-
-    'log': {
-      writable: false
-    },
-
-    'addProperties': {
-      writable: false
-    }
+    '_isLogging': { writable: true }
   });
 
   Object.defineProperties(sjs, {
-  	/*
-  	Accessor descriptors
-  	 */
   	'enableLogging': {
   		get: function sjs_enableLogging_get() {
   			return this.Base.enableLogging;
@@ -132,11 +127,6 @@
   		}
   	},
 
-  	/*
-  	Data descriptors
-  	 */
-  	'Base': {
-      writable: false
-    }
+  	'Base': { writable: false }
   });
 })();

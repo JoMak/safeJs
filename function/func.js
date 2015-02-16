@@ -3,6 +3,7 @@
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
  * @version: 1.0.0
  */
+
 (function() {
   "use strict";
 
@@ -10,29 +11,43 @@
 
   /**
    * Convert an Object, string or Array into an sjs.ParamDefinition object.
-   * @param {Object | string | Array | ParamDefinition} param
+   * 
+   * @param {!(Object|string|Array<string, object>|ParamDefinition)} paramDef
+   * @param {string} paramName Name of parameter
    * @returns {ParamDefinition}
+   * 
+   * @private
    */
   var getParamDefintion = function func_getParamDefinition(paramDef, paramName) { 
     if (!(paramDef instanceof ParamDefinition)) {
       paramDef = new ParamDefinition(paramDef);
     }
-    paramDef.name = paramName;
+    paramDef.paramName = paramName;
     return paramDef;
   };
 
+  /**
+   * Calls 'isValidWith' for the supplied ParamDefinition
+   * 
+   * @param  {Array} paramDef An array where the first element is a ParamDefinition
+   * and the second element is the value to check the ParamDefintion against
+   * @return {boolean} True if the value matches the supplied ParamDefinition (throws otherwise)
+   * @throws {TypeError} If the value does not match the supplied ParamDefinition
+   * 
+   * @private
+   */
   var checkType = function func_checkType(paramDef) {
-    paramDef[0].isValidWith(paramDef[1]);
+    return paramDef[0].isValidWith(paramDef[1]);
   };
 
   /**
-   * @param  {Object | Object[]} params Descriptions of the types of all of the parameters within the method
+   * @param {(Object|Object[])} params Descriptions of the types of all of the parameters within the method
    * (or just the parameters you would like checked)
    * @param  {function} method The method whose parameters will be checked
    * @return {function} a wrapped method of the function passed in that does
    * type checking of all of the parameter definitions passed in.
    *
-   * @since 1.0.0
+   * @memberof sjs
    */
   var func = function func(params, method, context) {
     if (!_.isObject(params)) {
