@@ -47,7 +47,7 @@
    * @return {function} a wrapped method of the function passed in that does
    * type checking of all of the parameter definitions passed in.
    *
-   * @memberof sjs
+   * @memberOf sjs
    */
   var func = function func(params, method, context) {
     if (!_.isObject(params)) {

@@ -6,6 +6,8 @@ This javascript library is intended to provide some safe checking features to th
 For now, safeJs will introduce type checking for javascript functions as well as providing an easy way to wrap promise callbacks with an appropriate context. More features will come as I come up with them I guess?
 
 ##Documentation
+**Note**: run `jsdoc *` to generate docs for all properties of the `sjs` object.
+
 Currently, only parameter type checking, i.e. `sjs.func` is under implementation. Basic type checking is completed, however additional features (such as type checking for infinite parameters) still needs to be completed.
 
 ###Parameter Defintions:
