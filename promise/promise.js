@@ -9,15 +9,7 @@
   var promise = {};
 
   Object.setProperties(promise, {
-    /*
-    Fields
-     */
-    '_promObj': {
-      configurable: false,
-      enumerable: false,
-      writable: true,
-      value: null
-    }
+    '_promObj': { writable: true }
   });
 
   window.promise = promise;

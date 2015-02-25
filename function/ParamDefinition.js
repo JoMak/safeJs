@@ -19,7 +19,7 @@
    * or string (or a mix of objects or strings) describing the allowed types of the parameter
    * 
    * @constructor
-   * @memberof sjs
+   * @memberOf sjs
    */
   var ParamDefinition = function ParamDefintion(settings) {
     this._super.apply(this, null);
@@ -57,38 +57,38 @@
 
   /**
    * Allow the parameter to be undefined
-   * @type {boolean} [allowUndefined=false]
+   * @property {boolean} [allowUndefined=false]
    */
   ParamDefinition.prototype.allowUndefined = false;
 
   /**
    * Allow the parameter to be null
-   * @type {boolean} [allowNull=false]
+   * @property {boolean} [allowNull=false]
    */
   ParamDefinition.prototype.allowNull = false;
 
   /**
    * Allow the parameter to be empty
    * An 'empty' object is one defined by underscorejs' `_.isEmpty` method
-   * @type {boolean} [allowEmpty=true]
+   * @property {boolean} [allowEmpty=true]
    */
   ParamDefinition.prototype.allowEmpty = true;
 
   /**
    * Valid types the parameter is allowed to be
-   * @type {!Array<string, object>} [types=['object']]
+   * @property {!Array<string, object>} [types=['object']]
    */
   ParamDefinition.prototype.types = ['object'];
 
   /**
    * The position of a parameter in the method
-   * @type {number} [pos=NaN]
+   * @property {number} [pos=NaN]
    */
   ParamDefinition.prototype.pos = NaN;
 
   /**
    * Name of the parameter
-   * @type {string} [paramName='']
+   * @property {string} [paramName='']
    */
   ParamDefinition.prototype.paramName = '';
 
@@ -209,17 +209,17 @@
           types = [types];
         }
 
-        try {
-          types.forEach(function(type) {
-            if (!_.isString(type) && !_.isObject(type)) {
-              throw new TypeError('Property "types" must be either ' +
-                '(1) An object, (2) A string or (3) an array of a either objects or strings');
-            }
-          });
-        } catch (err) {
-          this.log('error', 'Could not set "paramType":', types);
-          throw err;
-        }
+        types.forEach(function(type) {
+          if (_.isNull(type)) {
+            this.allowNull = true;
+            return;
+          }
+
+          if (!_.isString(type) && !_.isObject(type)) {
+            throw new TypeError('object ' + type + ' for property "types" must be either: ' + 
+              '(1) An object, (2) A string or (3) an array of a either objects or strings');
+          }
+        }, this);
 
         this._types = types;
       }

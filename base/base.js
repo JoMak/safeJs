@@ -11,7 +11,7 @@
    * Base object which all other objects (with constructors) will inherit from.
    * 
    * @constructor
-   * @memberof sjs
+   * @memberOf sjs
    */
   var Base = function Base() { };
 
@@ -25,7 +25,7 @@
 
   /**
    * Enable or disable logging for this instance
-   * @type {boolean} [enableLogging=true]
+   * @property {boolean} [enableLogging=true]
    */
   Base.prototype.enableLogging = true;
 
@@ -71,7 +71,7 @@
   /**
    * enable or disable logging *globally* with all isntances of objects inherited from Base
    * Note: this *does not* disable logging from intances which have set enable logging themselves
-   * @type {boolean} [enableLogging=true]
+   * @property {boolean} [enableLogging=true]
    */
   window.sjs.enableLogging = true;
 
