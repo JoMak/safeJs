@@ -1,0 +1,35 @@
+{
+  "name": "safeJs",
+  "version": "1.0.0",
+  "description": "JavaScript type safety and more!",
+  "main": "sjs.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KarimP/safeJs.git"
+  },
+  "keywords": [
+    "js",
+    "safe",
+    "type",
+    "check",
+    "safeJs",
+    "JavaScript",
+    "javascript"
+  ],
+  "author": "Karim Piyar Ali",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KarimP/safeJs/issues"
+  },
+  "homepage": "https://github.com/KarimP/safeJs",
+  "devDependencies": {
+    "bower": "^1.3.12",
+    "grunt": "^0.4.5"
+  }
+}
