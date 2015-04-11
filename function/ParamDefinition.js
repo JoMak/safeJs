@@ -11,7 +11,7 @@
 
   /**
    * Defines the properties of a parameter,
-   * specifically if the types they are allowed to be,
+   * specifically, the types they are allowed to be,
    * their positions, names as well as whether they are allowed be empty, null or undefined
    * 
    * @param {?(Object|Array|string)} settings default values for the ParamDefinition object
@@ -88,6 +88,7 @@
 
   /**
    * Name of the parameter
+   * Used to display error messages
    * @property {string} [paramName='']
    */
   ParamDefinition.prototype.paramName = '';
@@ -102,7 +103,7 @@
    */
   ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
 
-    //check for undefined, null, and empty first
+    //check for undefined, and null first
     if (_.isUndefined(value)) {
       if (!this._allowUndefined) {
         throw new TypeError('Parameter ' + this.paramName + ' cannot be undefined');
@@ -212,6 +213,11 @@
         types.forEach(function(type) {
           if (_.isNull(type)) {
             this.allowNull = true;
+            return;
+          }
+
+          if (_.isUndefined(type)) {
+            this.allowUndefined = true;
             return;
           }
 
