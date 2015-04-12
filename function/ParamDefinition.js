@@ -97,23 +97,29 @@
    * Check if the passed in object/value matches the parameter definition
    * 
    * @param {*} value Value to check the parameter types and restrictions against
+   * @param {string} methodName Name of method who's parameter value is being checked
    * @return {Boolean} True if the value given matches the parameter definition, 
    *                        throws can error otherwise
    * @throws {TypeError} If the value given is does not match the parameter definition
    */
-  ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
+  ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value, methodName) {
+    if (_.isString(methodName) && methodName !== '') {
+      methodName = '[' + methodName + '] ';
+    } else {
+      methodName = '';
+    }
 
     //check for undefined, and null first
     if (_.isUndefined(value)) {
       if (!this._allowUndefined) {
-        throw new TypeError('Parameter ' + this.paramName + ' cannot be undefined');
+        throw new TypeError(methodName + 'Parameter ' + this.paramName + ' cannot be undefined');
       }
       return;
     }
 
     if (_.isNull(value)) {
       if (!this._allowNull) {
-        throw new TypeError('Parameter ' + this.paramName + ' cannot be null');
+        throw new TypeError(methodName + 'Parameter ' + this.paramName + ' cannot be null');
       }
       return;
     }
@@ -139,14 +145,14 @@
     }, this);
 
     if (!validType) {
-      throw new TypeError('Invalid type for parameter ' + this.paramName +
+      throw new TypeError(methodName +'Invalid type for parameter ' + this.paramName +
           ': Expected type(s): ' + this.types +
           ' Found type: ' + typeof(value));
     }
 
     //check for empty
     if (!this._allowEmpty && _.isEmpty(value)) {
-      throw new TypeError('Parameter ' + this.paramName + ' cannot be empty');
+      throw new TypeError(methodName + 'Parameter ' + this.paramName + ' cannot be empty');
     }
 
     return true;
@@ -251,8 +257,8 @@
       },
 
       set: function ParamDefinition_paramName_set(paramName) {
-        if (!_.isString(name)) {
-          throw new TypeError('Property "name" must be of type: "string"');
+        if (!_.isString(paramName)) {
+          throw new TypeError('Property "paramName" must be of type: "string"');
         }
 
         this._paramName = paramName;

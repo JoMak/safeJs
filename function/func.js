@@ -22,7 +22,7 @@
     if (!(paramDef instanceof ParamDefinition)) {
       paramDef = new ParamDefinition(paramDef);
     }
-    paramDef.paramName = paramName;
+    paramDef.paramName = paramName.toString();
     return paramDef;
   };
 
@@ -37,19 +37,22 @@
    * @private
    */
   var checkType = function func_checkType(paramDef) {
-    return paramDef[0].isValidWith(paramDef[1]);
+    return paramDef[0].isValidWith(paramDef[1], this.name);
   };
-
+  
   /**
-   * @param {(Object|Object[])} params Descriptions of the types of all of the parameters within the method
+   * Wraps a passed in method with it's parameter types and validates those parameter types on execution
+   * @param  {Object | Object[]} params Descriptions of the types of all of the parameters within the method
    * (or just the parameters you would like checked)
    * @param  {function} method The method whose parameters will be checked
+   * @param  {Object} [context=null] Value to use as `this` when executing callback.
+   * @param  {string} methodName Assign name of returned method
    * @return {function} a wrapped method of the function passed in that does
    * type checking of all of the parameter definitions passed in.
    *
    * @memberOf sjs
    */
-  var func = function func(params, method, context) {
+  var func = function func(params, method, context, methodName) {
     if (!_.isObject(params)) {
       throw new TypeError('Parameter definitions must be of type: "Object" or "Array"');
     }
@@ -61,13 +64,13 @@
     var paramDefns = _.map(params, getParamDefintion);
 
     return _.wrap(method, function(origMethod) {
-      var args = _.toArray(arguments);
-      args.shift();
+      var args = Array.prototype.slice.call(arguments, 1);
+      this.name = methodName || origMethod.name;
 
-      //check parameters for types
-      _.zip(paramDefns, args).forEach(checkType);
+      //check param types
+      _.zip(paramDefns, args).forEach(checkType, this);
 
-      origMethod.apply(context, args);
+      return origMethod.apply(context, args);
     });
   };
 

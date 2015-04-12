@@ -20,7 +20,9 @@ An instance of a `ParamDefinition` object or an object that contains properties 
 
 Note that, for now, if there are only `n` parameter types/definitions specified, then only the first `n` parameters of the function will be checked. Also (for now) the parameter definitions must be placed in the order the parameters occur in the function.
 
-You can also pass in the function context (i.e. the `this` variable) as the third parameter to `func` to run in a specific context. This will also ensure that the function is run in that context specified when passing it as an event listener or as a callback.
+You can pass in the function context (i.e. the `this` variable) as the third parameter to `func` to run in a specific context. This will also ensure that the function is run in that context specified when passing it as an event listener or as a callback.
+
+You can also pass in the method name of the function as the fourth parameter. This will ensure that the method name appears in the stack trace as well as in the error message thrown when a parameter does not match its type definition.
 
 ####Example
 	var myFunction = sjs.func({

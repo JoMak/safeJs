@@ -8,6 +8,7 @@
 (function() {
   "use strict";
   var expect = chai.expect;
+  var assert = chai.assert;
 
   /*
   *********BASE*********
@@ -229,7 +230,11 @@
 
     it('Parameter names in error messages', function() {
       var testFunction = sjs.func({param1: 'string'}, function(param1) {});
-      expect(testFunction.bind(null, 6)).to.throw(TypeError, /param1/);      
+      expect(testFunction.bind(null, 6)).to.throw(TypeError, /param1/);
+
+      //now array
+      testFunction = sjs.func(['string'], function(param1) {});
+      expect(testFunction.bind(null, 6)).to.throw(TypeError, /0/);
     });
 
     it('pass in ParamDefinition properties', function() {
@@ -322,7 +327,7 @@
       expect(testFunction.bind(null, '', new TypeError(), '')).to.throw(TypeError, /parameter 2/);
     });
 
-    it('pass all four objects', function() {
+    it('pass in object, ParameterDefinition, string and ParameterDefinition properties', function() {
       var paramDef = new sjs.ParamDefinition();
       paramDef.allowNull = true;
       paramDef.types = 'string';
@@ -351,6 +356,39 @@
 
       expect(testFunction.bind(null, undefined, '', new TypeError(), null)).to.not.throw();
     });
+
+    it('pass in method context', function() {
+      var context = {
+        testProp: 26
+      };
+
+      var testFunction = sjs.func(['number'], function(param1) {
+        return this.testProp;
+      }, context);
+
+      expect(testFunction.bind(null, 'test')).to.throw(TypeError);
+      expect(testFunction.bind(null, 9)).to.not.throw();
+      expect(testFunction(9)).to.equal(context.testProp);
+    });
+
+    it('pass in method name', function() {
+      var testFunction = sjs.func({
+        param1: ['number']
+      }, function(param1) {}, null, 'methodName');
+
+      expect(testFunction.bind(null, 'test')).to.throw(TypeError, /\[methodName\].*param1/);
+      expect(testFunction.bind(null, 9)).to.not.throw();
+    });
+
+    it('original method has name', function() {
+      var testFunction = sjs.func({
+        param1: ['number']
+      }, function methodName(param1) {});
+
+      expect(testFunction.bind(null, 'test')).to.throw(TypeError, /\[methodName\].*param1/);
+      expect(testFunction.bind(null, 9)).to.not.throw();
+    });
+
   });
 
 })();
