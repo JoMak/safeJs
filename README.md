@@ -37,7 +37,7 @@ var myFunction = sjs.func({
 	param3: ['function', 'element']
 }, function myFunction(param1, param2, param3) {
    console.log ('I ran!', param1, param2, param3);
-}, this, 'CustomName');
+}, this);
 
 //will throw
 myFunction({}, 4, 'a string');
@@ -55,11 +55,11 @@ The parameter definitions can also be passed in directly as an array (instead of
 ```javascript
 var myFunction = sjs.func(['string', 'number', 'element'], function myFunction(param1, param2, param3) {
     console.log('I ran!', param1, param2, param3);
-}, this, customName);
+}, this, 'CustomName');
 
 //will throw
 myFunction({}, 4, 'a string');
-"TypeError: [customName] Invalid type for parameter 0: Expected type(s): string, number. Found type: object"
+"TypeError: [CustomName] Invalid type for parameter 0: Expected type(s): string, number. Found type: object"
 ```
 
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
