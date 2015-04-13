@@ -25,31 +25,42 @@ You can pass in the function context (i.e. the `this` variable) as the third par
 You can also pass in the method name of the function as the fourth parameter. This will ensure that the method name appears in the stack trace as well as in the error message thrown when a parameter does not match its type definition.
 
 ####Example
-	var myFunction = sjs.func({
-		param1: {
-			types: ["string", "number", MyCustomObject],
-			allowEmpty: false,
-			allowNull: true
-		},
-		param2: 'string',
-		param3: ['function', 'element']
-	}, function(param1, param2, param3) {
-		console.log ('I ran!', param1, param2, param3);
-	}, this);
 
-	myFunction({}, 4, 'a string');
-	//throws error: 
-	'TypeError: Invalid type for parameter param1: Expected type(s): string,number Found type: object'
+```javascript
+var myFunction = sjs.func({
+	param1: {
+		types: ["string", "number", MyCustomObject],
+		allowEmpty: false,
+		allowNull: true
+	},
+	param2: 'string',
+	param3: ['function', 'element']
+}, function myFunction(param1, param2, param3) {
+   console.log ('I ran!', param1, param2, param3);
+}, this, 'CustomName');
 
-	//will run
-	myFunction(4, 'a string', document.createElement('div'));
+//will throw
+myFunction({}, 4, 'a string');
+"TypeError: [myFunction] Invalid type for parameter param1: Expected type(s): string, number. Found type: object"
+
+//will run
+myFunction('12', 'a string', document.createElement('div'));
+"I ran! 12 a string   <div></div>"
+```
 
 The parameter definitions can also be passed in directly as an array (instead of an object with the parameter names) to make creating functions from `func` seem less intrusive.
 
 ####Example
-	var myFunction = sjs.func(['string', 'number', 'element'], function(param1, param2, param3) {
-		console.log('I ran!', param1, param2, param3);
-	});
+
+```javascript
+var myFunction = sjs.func(['string', 'number', 'element'], function myFunction(param1, param2, param3) {
+    console.log('I ran!', param1, param2, param3);
+}, this, customName);
+
+//will throw
+myFunction({}, 4, 'a string');
+"TypeError: [customName] Invalid type for parameter 0: Expected type(s): string, number. Found type: object"
+```
 
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 

@@ -146,8 +146,8 @@
 
     if (!validType) {
       throw new TypeError(methodName +'Invalid type for parameter ' + this.paramName +
-          ': Expected type(s): ' + this.types +
-          ' Found type: ' + typeof(value));
+          ': Expected type(s): ' + this.types.join(', ') +
+          '. Found type: ' + typeof(value));
     }
 
     //check for empty
