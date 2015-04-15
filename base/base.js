@@ -66,10 +66,8 @@
     }
   };
 
-  window.sjs.Base = Base;
-
   /**
-   * enable or disable logging *globally* with all instances of objects inherited from Base
+   * enable or disable logging *globally* (i.e. for all instances of objects inherited from Base)
    * Note: this *does not* disable logging from instances which have manually enabled logging themselves
    * @property {boolean} [enableLogging=true]
    */
@@ -87,9 +85,7 @@
       }
     },
     
-    'toString': {
-      writable: false
-    }
+    'toString': { writable: false }
   });
 
   Object.defineProperties(Base.prototype, {    
@@ -116,6 +112,8 @@
     '_isLogging': { writable: true }
   });
 
+  window.sjs.Base = Base;
+
   Object.defineProperties(sjs, {
   	'enableLogging': {
   		get: function sjs_enableLogging_get() {
@@ -129,4 +127,5 @@
 
   	'Base': { writable: false }
   });
+
 })();

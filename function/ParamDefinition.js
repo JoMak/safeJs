@@ -9,6 +9,40 @@
 
   var Base = window.sjs.Base;
 
+  var Defaults = {
+    allowUndefined: false,
+    allowNull: false,
+    allowEmpty: true
+  };
+
+  /**
+   * Apply default properties for this object
+   * 
+   * @private
+   * @memberOf ParamDefinition
+   */
+  var applyDefaults = function applyDefaults(obj) {
+    if (obj != null) {
+      for (var prop in Defaults) {
+        obj[prop] = Defaults[prop];
+      }
+    }
+  };
+
+  /**
+   * Sets the default values for some properties of the object
+   * @param {Object} newDefaults An object containing the new default values of the specified properties
+   *
+   * @memberOf ParamDefinition
+   */
+  var setDefaults = function setDefaults(newDefaults) {
+    for (var key in newDefaults) {
+      if (!_.isUndefined(Defaults[key]) && typeof(Defaults[key]) === typeof(newDefaults[key])) {
+        Defaults[key] = newDefaults[key];
+      }
+    }
+  };
+
   /**
    * Defines the properties of a parameter,
    * specifically, the types they are allowed to be,
@@ -21,8 +55,10 @@
    * @constructor
    * @memberOf sjs
    */
-  var ParamDefinition = function ParamDefintion(settings) {
+  var ParamDefinition = function ParamDefinition(settings) {
     this._super.apply(this, null);
+
+    this.applyDefaults(this);
     
     if (_.isString(settings) || _.isArray(settings)) {
       settings = { types: settings };
@@ -133,15 +169,13 @@
       if (_.isString(type)) {
         type = type.toLowerCase();
         var isCheck = 'is' + type[0].toUpperCase() + type.substring(1);
-        if (_[isCheck]){
+        if (_[isCheck]) {
           return _[isCheck](value);
         }
 
       } else {
         return (value instanceof type);
       }
-
-      return false;      
     }, this);
 
     if (!validType) {
@@ -158,9 +192,18 @@
     return true;
   };
 
-  window.sjs.ParamDefinition = ParamDefinition;
+  // var checkTypes = function ParamDefinition_checkType(types, value) {
+
+  // };
 
   //property definitions
+  Object.defineProperties(ParamDefinition, {
+    'setDefaults': { 
+      writable: false,
+      value: setDefaults
+    }, 
+  });
+
   Object.defineProperties(ParamDefinition.prototype, {
     'allowUndefined': {
       get: function ParamDefinition_allowUndefined_get() {
@@ -227,8 +270,8 @@
             return;
           }
 
-          if (!_.isString(type) && !_.isObject(type)) {
-            throw new TypeError('object ' + type + ' for property "types" must be either: ' + 
+          if (!_.isString(type) && !_.isArray(type) && !_.isObject(type)) {
+            throw new TypeError('object ' + type + ' in array "types" must be either: ' + 
               '(1) An object, (2) A string or (3) an array of a either objects or strings');
           }
         }, this);
@@ -269,14 +312,19 @@
     '_super': { writable: false },
     'name': { writable: true },
     'isValidWith': { writable: false },
+    'applyDefaults': { 
+      writable: false,
+      value: applyDefaults
+    },
 
     '_paramName': { writable: true },
     '_allowNull': { writable: true },
     '_allowEmpty': { writable: true },
     '_allowUndefined': { writable: true },
     '_types': { writable: true },
-    '_pos': { writable: true }    
+    '_pos': { writable: true }   
   });
-
+  
+  window.sjs.ParamDefinition = ParamDefinition;
   Object.defineProperty(window.sjs, 'ParamDefinition', { writable: false });
 })();

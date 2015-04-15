@@ -66,15 +66,20 @@ The tradeoff with this method is that the error messages will only provide the i
 
 ###Roadmap
 
-####Allow defining in Global Namespace and Function names
-* Allow `sjs.func` to be define wrapped functions in the global namespace.
-* Not exactly a safe practice but should be allow regardless.
+#### ~~Allow defining in Global Namespace~~
+* ~~Allow `sjs.func` to be define wrapped functions in the global namespace.~~
+* ~~Not exactly a safe practice but should be allowed regardless.~~
+* Changed my mind on this one. It'll be more verbose (and it's better practice) for developers to do something like `window.myFunction = sjs.func(...)`
+
+####Allow defining types for objects within arrays
+* Should allow passing in a `ParamDefinition`, a type, or a list of object types for objects within parameters that are of type "array"
+* Should allow for nesting (i.e. types of objects within arrays within arrays)
 
 ####Position of Parameter Definitions
-* The `func` method should also allow parameter definitions to not be placed in the order the parameters are occuring in the function (i.e. by specifying a `pos` property to specify a postion)
+* The `func` method should also allow parameter definitions to not be placed in the order the parameters are occuring in the function (i.e. by specifying a `pos` property to specify a position)
 
 ####Variadic Parameter Definitions
-* Ideally, the `func` method should allo parameter definitions for variadic parameters (e.g. defining a parameter definition for all parameters after the third parameter).
+* Ideally, the `func` method should allow parameter definitions for variadic parameters (e.g. defining a parameter definition for all parameters after the third parameter).
 
 ####Overlapping Parameter Definitions
 * This feature would kind of be like the opposite of the *Variadic Parameter Definitions* feature: Allow for multiple parameter definitions to define the type of a single parameter.
