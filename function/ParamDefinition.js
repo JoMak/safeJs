@@ -56,6 +56,10 @@
    * @memberOf sjs
    */
   var ParamDefinition = function ParamDefinition(settings) {
+    if (settings instanceof ParamDefinition) {
+      return settings;
+    }
+
     this._super.apply(this, null);
 
     this.applyDefaults(this);
@@ -192,9 +196,53 @@
     return true;
   };
 
-  // var checkTypes = function ParamDefinition_checkType(types, value) {
+  var checkTypes = function ParamDefinition_checkType(types, value) {
+    //check for undefined, and null first
+    if (_.isUndefined(value)) {
+      if (!this._allowUndefined) {
+        throw new TypeError(this.paramName + ' cannot be undefined');
+      }
+      return;
+    }
 
-  // };
+    if (_.isNull(value)) {
+      if (!this._allowNull) {
+        throw new TypeError(this.paramName + ' cannot be null');
+      }
+      return;
+    }
+
+    //check for types now
+    var validType = types.some(function(type) {
+      if (type === '*') {
+        return true;
+      }
+
+      if (_.isString(type)) {
+        type = type.toLowerCase();
+        var isCheck = 'is' + type[0].toUpperCase() + type.substring(1);
+        if (_[isCheck]) {
+          return _[isCheck](value);
+        }
+
+      } else {
+        return (value instanceof type);
+      }
+    }, this);
+
+    if (!validType) {
+      throw new TypeError(methodName +'Invalid type for parameter ' + this.paramName +
+          ': Expected type(s): ' + this.types.join(', ') +
+          '. Found type: ' + typeof(value));
+    }
+
+    //check for empty
+    if (!this._allowEmpty && _.isEmpty(value)) {
+      throw new TypeError(methodName + 'Parameter ' + this.paramName + ' cannot be empty');
+    }
+
+    return true;
+  };
 
   //property definitions
   Object.defineProperties(ParamDefinition, {
@@ -259,24 +307,43 @@
           types = [types];
         }
 
+        this._types = [];
+
         types.forEach(function(type) {
           if (_.isNull(type)) {
             this.allowNull = true;
-            return;
-          }
 
-          if (_.isUndefined(type)) {
+          } else if (_.isUndefined(type)) {
             this.allowUndefined = true;
-            return;
-          }
 
-          if (!_.isString(type) && !_.isArray(type) && !_.isObject(type)) {
-            throw new TypeError('object ' + type + ' in array "types" must be either: ' + 
-              '(1) An object, (2) A string or (3) an array of a either objects or strings');
+          } else if (_.isArray(type)) {
+            if (!_.isEmpty(type)) {
+              this._types.push({
+                'container': 'array',
+                'subDefs': new ParamDefinition(type)
+              });
+
+            } else {
+              throw new TypeError('object' + type + ' in array "types" cannot be empty. ' +
+                'Please place valid types within the container to indicate valid subtypes of objects within the container ' +
+                'or, put in just "array" to indicate the just the container type');
+            }
+
+          } else if (_.isString(type) || _.isObject(type)) {
+
+            if (!_.isEmpty(type)) {
+              this._types.push(type);
+
+            } else {
+              throw new TypeError('String' + type + ' in array "types" cannot be empty.');
+            }
+
+          } else {
+            throw new TypeError('object ' + type + ' in array "types" is an invalid type. It can be either: ' + 
+              '(1) An object, (2) A string, (3) an array of a either objects or strings.');
           }
+          
         }, this);
-
-        this._types = types;
       }
     },
 
@@ -322,7 +389,7 @@
     '_allowEmpty': { writable: true },
     '_allowUndefined': { writable: true },
     '_types': { writable: true },
-    '_pos': { writable: true }   
+    '_pos': { writable: true }
   });
   
   window.sjs.ParamDefinition = ParamDefinition;

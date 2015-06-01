@@ -6,7 +6,7 @@ This javascript library is intended to provide some safe checking features to th
 For now, safeJs will introduce type checking for javascript functions as well as providing an easy way to wrap promise callbacks with an appropriate context. More features will come as I come up with them I guess?
 
 ##Documentation
-**Note**: run `jsdoc *` to generate docs for all properties of the `sjs` object.
+**Note**: run `jsdoc -c ./jsdoc.json` to generate docs for all properties of the `sjs` object.
 
 Currently, only parameter type checking, i.e. `sjs.func` is under implementation. Basic type checking is completed, however additional features (such as type checking for variadic parameters) still needs to be completed.
 
@@ -20,7 +20,7 @@ An instance of a `ParamDefinition` object or an object that contains properties 
 
 Note that, for now, if there are only `n` parameter types/definitions specified, then only the first `n` parameters of the function will be checked. Also (for now) the parameter definitions must be placed in the order the parameters occur in the function.
 
-You can pass in the function context (i.e. the `this` variable) as the third parameter to `func` to run in a specific context. This will also ensure that the function is run in that context specified when passing it as an event listener or as a callback.
+You can pass in the function context (i.e. the `this` variable) as the third parameter to `func` to run in a specific context. This will also ensure that the function runs in the context specified when passing it as an event listener or as a callback.
 
 You can also pass in the method name of the function as the fourth parameter. This will ensure that the method name appears in the stack trace as well as in the error message thrown when a parameter does not match its type definition.
 

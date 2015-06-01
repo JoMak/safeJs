@@ -19,9 +19,7 @@
    * @private
    */
   var getParamDefintion = function func_getParamDefinition(paramDef, paramName) { 
-    if (!(paramDef instanceof ParamDefinition)) {
-      paramDef = new ParamDefinition(paramDef);
-    }
+    paramDef = new ParamDefinition(paramDef);
     paramDef.paramName = paramName.toString();
     return paramDef;
   };

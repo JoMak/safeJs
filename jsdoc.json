@@ -1,0 +1,17 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    "source": {
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_",
+        "exlude": [ "bower_components/", "node_modules/", "mock.js", "out/", "tests/" ],
+        "include": [ "base/", "function/", "promise/", "sjs.js" ]
+    },
+    "plugins": [],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    }
+}
