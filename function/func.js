@@ -18,7 +18,7 @@
    * 
    * @private
    */
-  var getParamDefintion = function func_getParamDefinition(paramDef, paramName) { 
+  var getParamDefinition = function func_getParamDefinition(paramDef, paramName) { 
     paramDef = new ParamDefinition(paramDef);
     paramDef.paramName = paramName.toString();
     return paramDef;
@@ -35,7 +35,16 @@
    * @private
    */
   var checkType = function func_checkType(paramDef) {
-    return paramDef[0].isValidWith(paramDef[1], this.name);
+    try {
+      paramDef[0].isValidWith(paramDef[1]);
+
+    } catch (e) {
+      if (e instanceof ParamDefinition.ParamDefinitionError) {
+        e.methodName = this.name;
+      }
+
+      throw e;
+    }
   };
   
   /**
@@ -59,7 +68,7 @@
       context = null;
     }
 
-    var paramDefns = _.map(params, getParamDefintion);
+    var paramDefns = _.map(params, getParamDefinition);
 
     return _.wrap(method, function(origMethod) {
       var args = Array.prototype.slice.call(arguments, 1);
