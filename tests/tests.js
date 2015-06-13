@@ -147,9 +147,9 @@
       var args = arguments;
       isValidWithCheckParams.forEach(function(param, argIndex) {
         if (args[argIndex]) {
-          expect(paramDef.isValidWith.bind(paramDef, param)).to.not.throw();
+          expect(paramDef.isValidWith(param)).to.be.true;
         } else {
-          expect(paramDef.isValidWith.bind(paramDef, param)).to.throw(TypeError);
+          expect(paramDef.isValidWith(param)).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
         }
       });
     };
@@ -182,43 +182,73 @@
     //passing in 'null' as a type
     it('isValidWith: null type', function() {
       var paramDef = new ParamDefinition([null]);
-      expect(paramDef.isValidWith.bind(paramDef, null)).to.not.throw();
+      expect(paramDef.isValidWith(null)).to.be.true;
     });
 
     //test passing in string types, object types, or mixed with single and multiple types
     it('isValidWith: single argument, string type', function() {
       var paramDef = new ParamDefinition('string');
-      expect(paramDef.isValidWith.bind(paramDef, '')).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, {})).to.throw(TypeError);
+      expect(paramDef.isValidWith('')).to.be.true;
+      expect(paramDef.isValidWith({})).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
     });
 
     it('isValidWith: multiple arguments, string types', function() {
       var paramDef = new ParamDefinition(['string', 'number', 'element']);
-      expect(paramDef.isValidWith.bind(paramDef, '')).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, 1)).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, document.createElement('div'))).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, {})).to.throw(TypeError);
+      expect(paramDef.isValidWith('')).to.be.true;
+      expect(paramDef.isValidWith(1)).to.be.true;
+      expect(paramDef.isValidWith(document.createElement('div'))).to.be.true;
+      expect(paramDef.isValidWith({})).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
     });
 
     it('isValidWith: single argument, object type', function() {
       var paramDef = new ParamDefinition([Error]);
-      expect(paramDef.isValidWith.bind(paramDef, new Error())).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, new TypeError())).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, {})).to.throw(TypeError);
+      expect(paramDef.isValidWith(new Error())).to.be.true;
+      expect(paramDef.isValidWith(new TypeError())).to.be.true;
+      expect(paramDef.isValidWith({})).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
     });
 
     it('isValidWith: multiple arguments, object types', function() {
       var paramDef = new ParamDefinition([Error, sjs.Base]);
-      expect(paramDef.isValidWith.bind(paramDef, paramDef)).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, new TypeError())).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, {})).to.throw(TypeError);
+      expect(paramDef.isValidWith(paramDef)).to.be.true;
+      expect(paramDef.isValidWith(new TypeError())).to.be.true;
+      expect(paramDef.isValidWith({})).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
     });
 
     it('isValidWith: multiple arguments, object and string types', function() {
       var paramDef = new ParamDefinition([Error, 'number']);
-      expect(paramDef.isValidWith.bind(paramDef, 1)).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, new TypeError())).to.not.throw();
-      expect(paramDef.isValidWith.bind(paramDef, {})).to.throw(TypeError);
+      expect(paramDef.isValidWith(1)).to.be.true;
+      expect(paramDef.isValidWith(new TypeError())).to.be.true;
+      expect(paramDef.isValidWith({})).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
+    });
+
+    it('isValidWith: container object with string/object', function() {
+      var paramDef = new ParamDefinition([[Error], ['number']]);
+
+      expect(paramDef.isValidWith([1])).to.be.true;
+      expect(paramDef.isValidWith([new TypeError()])).to.be.true;
+
+      expect(paramDef.isValidWith(new TypeError())).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
+      expect(paramDef.isValidWith(['1'])).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
+    });
+
+    it('isValidWith: container object with multiple string/object', function() {
+      var paramDef = new ParamDefinition([[Error, Element], ['number', 'string']]);
+
+      expect(paramDef.isValidWith([1, '2'])).to.be.true;
+      expect(paramDef.isValidWith([new TypeError(), document.createElement('div')])).to.be.true;
+
+      expect(paramDef.isValidWith([new TypeError(), 1])).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
+      expect(paramDef.isValidWith([document.createElement('div'), '2'])).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
+    });
+
+    it('isValidWith: container object with undefined and null', function() {
+      var paramDef = new ParamDefinition([[undefined], [null]]);
+
+      expect(paramDef.isValidWith([undefined])).to.be.true;
+      expect(paramDef.isValidWith([null])).to.be.true;
+
+      expect(paramDef.isValidWith([{}])).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
+      expect(paramDef.isValidWith(['2'])).to.be.an.instanceof(ParamDefinition.ParamDefinitionError);
     });
   });
 
@@ -355,6 +385,21 @@
       ], function(param1) {});
 
       expect(testFunction.bind(null, undefined, '', new TypeError(), null)).to.not.throw();
+    });
+
+    it('pass in array definition', function() {
+      var testFunction = sjs.func({
+        param1: [['string']]
+      }, function(param1) {});
+
+      expect(testFunction.bind(null, ['a', 'b'])).to.not.throw();
+      expect(testFunction.bind(null, ['a', 6])).to.throw(sjs.ParamDefinition.ParamDefinitionError);
+
+      //now array
+      testFunction = sjs.func([[['string']]], function(param1) {});
+
+      expect(testFunction.bind(null, ['a', 'b'])).to.not.throw();
+      expect(testFunction.bind(null, ['a', 6])).to.throw(sjs.ParamDefinition.ParamDefinitionError);
     });
 
     it('pass in method context', function() {

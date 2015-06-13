@@ -9,10 +9,13 @@
 
   /**
    * Error thrown when an invalid value is checked with a ParamDefinition
-   * @param {string} errorType     One of either: UNDEFINED_ERROR, NULL_ERROR, EMPTY_ERROR or TYPE_ERROR constants defined in the `ParamDefintionErrorObject`
+   * 
+   * @param {string} errorType One of either: UNDEFINED_ERROR, NULL_ERROR, EMPTY_ERROR or TYPE_ERROR constants defined in the `ParamDefintionErrorObject`
    * @param {string} customMessage Any additional custom message along with the generated one.
-   * @param {*} paramValue    Value of the parameter checked against the ParamDefinition
+   * @param {*} paramValue Value of the parameter checked against the ParamDefinition
    * @param {ParamDefinition} paramDef ParamDefinition the vale was checked against.
+   *
+   * @memberOf sjs:ParamDefinition!
    */
   var ParamDefinitionError = function ParamDefinitionError(errorType, paramValue, paramDef, customMessage) {
     var description = "Error: parameter";
@@ -40,7 +43,7 @@
       this.paramValue = paramValue;
       this.foundTypes = typeof(paramValue);
 
-      description += ' Expected types: ' + this.paramDef.types.join(', ') + '. Found type: ' + this.foundTypes;
+      description += ' Expected types: ' + printTypes(this.paramDef.types) + '. Found type: ' + this.foundTypes;
     }
 
     if (_.isString(customMessage)) {
@@ -70,12 +73,36 @@
 
   ParamDefinitionError.prototype._methodName = '';
 
+  var printTypes = function ParamDefinitionError_printTypes(types) {
+    var typeString = '[';
+
+    types.forEach(function(type, index) {
+      if (_.isString(type)) {
+        typeString += type;
+
+      } else if (_.isObject(type) && type.subDef && (type.subDef instanceof ParamDefinition)) {
+        typeString += printTypes(type.subDef.types);
+      }
+
+      if (index !== types.length - 1) {
+        typeString += ', ';
+      }
+
+    }, this);
+
+    return typeString + ']';
+  };
+
   //property definitions
   Object.defineProperties(ParamDefinitionError, { 
     'UNDEFINED_ERROR': { writable: false },
     'NULL_ERROR': { writable: false },
     'EMPTY_ERROR': { writable: false },
-    'TYPE_ERROR': { writable: false }
+    'TYPE_ERROR': { writable: false },
+
+    'constructor': { writable: false },
+    '_super': { writable: false },
+    'name': { writable: true },
   });
 
   Object.defineProperties(ParamDefinitionError.prototype, {
@@ -103,6 +130,8 @@
     allowEmpty: true
   };
 
+  /*jshint forin: false */
+
   /**
    * Apply default properties for this object
    * 
@@ -116,6 +145,8 @@
       }
     }
   };
+
+  /*jshint forin: true */
 
   /**
    * Sets the default values for some properties of the object
@@ -141,6 +172,7 @@
    * or string (or a mix of objects or strings) describing the allowed types of the parameter
    * 
    * @constructor
+   * @extends {sjs.Base}
    * @memberOf sjs
    */
   var ParamDefinition = function ParamDefinition(settings) {
@@ -226,62 +258,67 @@
    * 
    * @param {*} value Value to check the parameter types and restrictions against
    * 
-   * @return {Boolean} True if the value given matches the parameter definition, 
-   *                        throws can error otherwise
-   * @throws {TypeError} If the value given is does not match the parameter definition
+   * @return {Boolean | ParamDefinitionError} True if the value given matches the parameter definition, 
+   *                        ParamDefinitionError error otherwise
    */
   ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
     //check for undefined, and null first
     if (_.isUndefined(value)) {
       if (!this._allowUndefined) {
-        throw new ParamDefinitionError(ParamDefinitionError.UNDEFINED_ERROR, value, this);
+        return new ParamDefinitionError(ParamDefinitionError.UNDEFINED_ERROR, value, this);
       }
-      return;
+      return true;
     }
 
     if (_.isNull(value)) {
       if (!this._allowNull) {
-        throw new ParamDefinitionError(ParamDefinitionError.NULL_ERROR, value, this);
+        return new ParamDefinitionError(ParamDefinitionError.NULL_ERROR, value, this);
       }
-      return;
+      return true;
     }
 
     //check for types now
-    var validType = checkTypes(this.types, value);
+    var isValid = false;
 
-    if (!validType) {
-      throw new ParamDefinitionError(ParamDefinitionError.TYPE_ERROR, value, this);
+    for (var i = 0; i < this._types.length; ++i) {
+      if (this._types[i] === '*') {
+        isValid = true;
+
+      } else {
+        if (_.isObject(this._types[i]) && this._types[i].container && this._types[i].subDef && (this._types[i].subDef instanceof ParamDefinition)) {
+          for (var j = 0; j < value.length; ++j) {
+            isValid = !(this._types[i].subDef.isValidWith(value[j]) instanceof ParamDefinitionError);
+            if (!isValid) {
+              break;
+            }
+          }
+
+        } else if (_.isString(this._types[i])) {
+          var isCheck = 'is' + this._types[i][0].toUpperCase() + this._types[i].substring(1).toLowerCase();
+          if (_[isCheck]) {
+            isValid = _[isCheck](value);
+          }
+
+        } else {
+          isValid = (value instanceof this._types[i]);
+        }
+      }
+
+      if (isValid) {
+        break;
+      }
+    }
+
+    if (!isValid) {
+      return new ParamDefinitionError(ParamDefinitionError.TYPE_ERROR, value, this);
     }
 
     //check for empty
-    if (!this._allowEmpty && _.isEmpty(value)) {
-      throw new ParamDefinitionError(ParamDefinitionError.EMPTY_ERROR, value, this);
+    if (_.isEmpty(value) && !this._allowEmpty) {
+      return new ParamDefinitionError(ParamDefinitionError.EMPTY_ERROR, value, this);
     }
 
     return true;
-  };
-
-  var checkTypes = function ParamDefinition_checkTypes(types, value) {
-    //check for types now
-    return types.some(function(type) {
-      if (type === '*') {
-        return true;
-      }
-
-      if (_.isObject(type) && type.container && type.subDefs && (type.subDefs instanceof ParamDefinition)) {
-        return type.subDefs.isValidWith(value);
-
-      } else if (_.isString(type)) {
-        type = type.toLowerCase();
-        var isCheck = 'is' + type[0].toUpperCase() + type.substring(1);
-        if (_[isCheck]) {
-          return _[isCheck](value);
-        }
-
-      } else {
-        return (value instanceof type);
-      }
-    });
   };
 
   //property definitions
@@ -289,7 +326,7 @@
     'setDefaults': { 
       writable: false,
       value: setDefaults
-    }, 
+    }
   });
 
   Object.defineProperties(ParamDefinition.prototype, {
@@ -360,7 +397,7 @@
             if (!_.isEmpty(type)) {
               this._types.push({
                 'container': 'array',
-                'subDefs': new ParamDefinition(type)
+                'subDef': new ParamDefinition(type)
               });
 
             } else {

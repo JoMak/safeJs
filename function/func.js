@@ -35,16 +35,14 @@
    * @private
    */
   var checkType = function func_checkType(paramDef) {
-    try {
-      paramDef[0].isValidWith(paramDef[1]);
+    var status = paramDef[0].isValidWith(paramDef[1]);
 
-    } catch (e) {
-      if (e instanceof ParamDefinition.ParamDefinitionError) {
-        e.methodName = this.name;
-      }
-
-      throw e;
+    if (status instanceof ParamDefinition.ParamDefinitionError) {
+      status.methodName = this.name;
+      throw status;
     }
+
+    return status;
   };
   
   /**
