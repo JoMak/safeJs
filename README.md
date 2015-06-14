@@ -1,28 +1,59 @@
 #safeJs Readme
 
 ##Description
-This javascript library is intended to provide some safe checking features to the javascript language. Although extremely flexible, certain features of the language, or of some common standards around the language can throw errors silently, making it harder to debug code as well as to enforce certain specifications.
+This javascript library is intended to provide some "safe" features to the javascript language. Although extremely flexible, certain features of the language, or of some common standards around the language can throw errors silently, making it harder to debug code as well as to enforce certain specifications.
 
-For now, safeJs will introduce type checking for javascript functions as well as providing an easy way to wrap promise callbacks with an appropriate context. More features will come as I come up with them I guess?
+For now, safeJs will introduce runtime type checking for javascript functions as well as providing an easy way to wrap promise callbacks with an appropriate context.
 
 ##Documentation
 **Note**: run `jsdoc -c ./jsdoc.json` to generate docs for all properties of the `sjs` object.
 
-Currently, only parameter type checking, i.e. `sjs.func` is under implementation. Basic type checking is completed, however additional features (such as type checking for variadic parameters) still needs to be completed.
+Currently, only runtime parameter type checking, i.e. `sjs.func` is under implementation. Basic type checking is completed, however additional features (such as type checking for variadic parameters) still needs to be completed.
 
-###Parameter Defintions:
-Parameter types are defined using `ParamDefinition` objects. These are simple objects that contain the types that the parameter will support, as well as whether the parameter is allowed to be `null`, empty (i.e. empty array, string, object, etc.) or `undefined`. `ParamDefinition` objects can be created and passed to the `sjs.func` method when wraping methods. However other objects that can be *turned into* `ParamDefintion` objects can also be passed in, such as just a string representation of a primitive type (i.e. 'string'), or a custom object that the parameter is supposed to be an instance of, or an object that contains properties for a `ParamDefinition`.
+###Runtime Type Checking
 
-###Method Type Checking:
-The `sjs.func` method will wrap the function passed to it that will check the type of its parameters as well as whether the parameter is `undefined`, `null` or empty.
-The parameter definitions can be passed in as a string describing a primative javascript type, a custom object, or an array of strings and custom objects.
-An instance of a `ParamDefinition` object or an object that contains properties of a `ParamDefinition` object can also be passed in.
+####Parameter Type Checking:
+The `sjs.func` method will wrap the function passed to it that will check the type of its parameters as well as whether the parameter is allowed to be `undefined`, `null` or empty (i.e. empty array, string, object, etc.):
 
-Note that, for now, if there are only `n` parameter types/definitions specified, then only the first `n` parameters of the function will be checked. Also (for now) the parameter definitions must be placed in the order the parameters occur in the function.
+`func(params, method, context, methodName) → {function}`
 
-You can pass in the function context (i.e. the `this` variable) as the third parameter to `func` to run in a specific context. This will also ensure that the function runs in the context specified when passing it as an event listener or as a callback.
+**Arguments**
+* `params`: An object or array containing the parameter definitions of each parameter that will be type checked (in the order they appear in the method).
+  * Object form: `{ <Parameter Name>: <Parameter Definition>, ... }`
+  * Array form: `[ <Parameter Definition>, ... ]` 
+* `method`: The method whose parameter types should be checked with the passed in parameter definitions
+* `context`(Optional): The value to use as `this` when executing the method
+* `methodName`(Optional): The method name to display in any invalid type error messages that are thrown
 
-You can also pass in the method name of the function as the fourth parameter. This will ensure that the method name appears in the stack trace as well as in the error message thrown when a parameter does not match its type definition.
+**Returns**: A wrapped function that will check the types of its parameters before executing `method`
+
+**Throws**: `ParamDefinitionError` object containing the names of the method and parameter (if available) and the parameter definition that the parameter value mismatches.
+
+#####Parameter Definitions
+Parameter definitions can be represented in many ways.
+
+1. **A string**: This is a string describing one of the following primitive JavaScript types: element, array, object, function, string, number, boolean, date, regexp.
+  * e.g. `{ param1: 'string' }`
+2. **A "Class" object**: This will make `sjs.func` check to ensure that the parameter value is an instance of the passed in object.
+  * e.g. `{ param1: Array }`
+3. **An array of 1 and/or 2**: This will ensure that the parameter value matches at least one of the given types
+  * e.g. `{ param1: ['string', Array ] }`
+4. **An object with 1, 2 or 3 under a `types` property**: This will allow [additional properties](#additional-properties) to be added to the parameter defintion.
+  * e.g. `{ param1: { types: ['string', Array] } }`
+5. **An instance of a `sjs.ParamDefinition` object**: This is a special class that all of the above parameter defintions will ultimately get converted to. It contains the types the parameter is allowed to be, along with it's name and any [additional properties](#additional-properties) described below. Any of the above representations of a parameter definition can be passed into the constructor of `sjs.ParamDefinition`
+  * e.g. `{ param1: new sjs.ParamDefintion([ 'string', Array ]) }`
+
+######Additional Properties
+The parameter definitions following style **4** and **5** can have the following additional properties:
+
+1. **(Boolean)`allowUndefined`**: Whether the parameter is allowed to be `undefined`
+  * e.g. `{ param1: { types: 'string', allowUndefined: false } }`
+2. **(Boolean)`allowNull`**: Whether the parameter is allowed to be `null`
+  * e.g. `{ param1: new sjs.ParamDefinition({ types: 'string', allowNull: true }) }`
+3. **(Boolean)`allowEmpty`**: Whether the parameter is allowed to be empty
+  * e.g. `{ param1: { types: 'string', allowEmpty: true } }`
+4. **(String) `paramName`**: Override the name of the parameter that will get displayed in any error messages of incorrect types
+  * e.g. `{ param1: { type: 'string', paramName: 'AnotherName' } }`
 
 ####Example
 
@@ -47,8 +78,7 @@ myFunction({}, 4, 'a string');
 myFunction('12', 'a string', document.createElement('div'));
 "I ran! 12 a string   <div></div>"
 ```
-
-The parameter definitions can also be passed in directly as an array (instead of an object with the parameter names) to make creating functions from `func` seem less intrusive.
+With an array version of parameter definitions (to make creating functions from `sjs.func` seem less intrusive).
 
 ####Example
 
@@ -61,7 +91,6 @@ var myFunction = sjs.func(['string', 'number', 'element'], function myFunction(p
 myFunction({}, 4, 'a string');
 "TypeError: [CustomName] Invalid type for parameter 0: Expected type(s): string, number. Found type: object"
 ```
-
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 
 ###Roadmap
@@ -71,9 +100,9 @@ The tradeoff with this method is that the error messages will only provide the i
 * ~~Not exactly a safe practice but should be allowed regardless.~~
 * Changed my mind on this one. It'll be more verbose (and it's better practice) for developers to do something like `window.myFunction = sjs.func(...)`
 
-####Allow defining types for objects within arrays
-* Should allow passing in a `ParamDefinition`, a type, or a list of object types for objects within parameters that are of type "array"
-* Should allow for nesting (i.e. types of objects within arrays within arrays)
+#### ~~Allow defining types for objects within arrays~~
+* ~~Should allow passing in a `ParamDefinition`, a type, or a list of object types for objects within parameters that are of type "array"~~
+* ~~Should allow for nesting (i.e. types of objects within arrays within arrays)~~
 
 ####Position of Parameter Definitions
 * The `func` method should also allow parameter definitions to not be placed in the order the parameters are occuring in the function (i.e. by specifying a `pos` property to specify a position)

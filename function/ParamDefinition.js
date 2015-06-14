@@ -10,12 +10,14 @@
   /**
    * Error thrown when an invalid value is checked with a ParamDefinition
    * 
-   * @param {string} errorType One of either: UNDEFINED_ERROR, NULL_ERROR, EMPTY_ERROR or TYPE_ERROR constants defined in the `ParamDefintionErrorObject`
+   * @param {string} errorType One of either: UNDEFINED_ERROR, NULL_ERROR, EMPTY_ERROR or TYPE_ERROR constants defined in the class object
    * @param {string} customMessage Any additional custom message along with the generated one.
    * @param {*} paramValue Value of the parameter checked against the ParamDefinition
-   * @param {ParamDefinition} paramDef ParamDefinition the vale was checked against.
+   * @param {sjs.ParamDefinition} paramDef ParamDefinition the vale was checked against.
    *
-   * @memberOf sjs:ParamDefinition!
+   * @constructor
+   * @extends {TypeError}
+   * @memberOf sjs.ParamDefinition
    */
   var ParamDefinitionError = function ParamDefinitionError(errorType, paramValue, paramDef, customMessage) {
     var description = "Error: parameter";
@@ -58,9 +60,36 @@
     return 'ParamDefinitionError';
   };
 
+  /**
+   * An undefined error
+   * @type {String}
+   *
+   * @constant
+   */
   ParamDefinitionError.UNDEFINED_ERROR = 'cannot be undefined.';
+
+  /**
+   * A null error
+   * @type {String}
+   *
+   * @constant
+   */
   ParamDefinitionError.NULL_ERROR = 'cannot be null.';
+
+  /**
+   * An empty error
+   * @type {String}
+   *
+   * @constant
+   */
   ParamDefinitionError.EMPTY_ERROR = 'cannot be emtpy.';
+
+  /**
+   * An invalid type error
+   * @type {String}
+   *
+   * @constant
+   */
   ParamDefinitionError.TYPE_ERROR = 'has invalid types.';
 
   ParamDefinitionError.prototype = Object.create(TypeError.prototype);
@@ -73,6 +102,25 @@
 
   ParamDefinitionError.prototype._methodName = '';
 
+  /**
+   * Name of the method that owns the parameter that the ParamDefinitionError occured in.
+   * The method name will be prepended to the error message
+   * This is mainly used by {@link sjs.func} to show the method name when showing the type error
+   * 
+   * @type {String}
+   *
+   * @optional
+   */
+  ParamDefinitionError.prototype.methodName = '';
+
+  /**
+   * Print types of a param definition. Recursive call that prints container types as well.
+   * @param  {Array} types An array of types as defined in the sjs.ParamDefintion.types# property
+   * @return {string} A string representation of the types
+   *
+   * @private
+   * @memberOf sjs.ParamDefinition.ParamDefinitionError
+   */
   var printTypes = function ParamDefinitionError_printTypes(types) {
     var typeString = '[';
 
@@ -136,7 +184,7 @@
    * Apply default properties for this object
    * 
    * @private
-   * @memberOf ParamDefinition
+   * @memberOf sjs.ParamDefinition.prototype
    */
   var applyDefaults = function applyDefaults(obj) {
     if (obj != null) {
@@ -152,7 +200,7 @@
    * Sets the default values for some properties of the object
    * @param {Object} newDefaults An object containing the new default values of the specified properties
    *
-   * @memberOf ParamDefinition
+   * @memberOf sjs.ParamDefinition
    */
   var setDefaults = function setDefaults(newDefaults) {
     for (var key in newDefaults) {
@@ -258,7 +306,7 @@
    * 
    * @param {*} value Value to check the parameter types and restrictions against
    * 
-   * @return {Boolean | ParamDefinitionError} True if the value given matches the parameter definition, 
+   * @return {Boolean | sjs.ParamDefinition.ParamDefinitionError} True if the value given matches the parameter definition, 
    *                        ParamDefinitionError error otherwise
    */
   ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {

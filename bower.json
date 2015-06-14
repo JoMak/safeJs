@@ -15,7 +15,7 @@
     "checking",
     "typecheck"
   ],
-  "license": "MIT",
+  "license": "APL v.2.0",
   "ignore": [
     "**/.*",
     "node_modules",

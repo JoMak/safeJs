@@ -12,9 +12,9 @@
   /**
    * Convert an Object, string or Array into an sjs.ParamDefinition object.
    * 
-   * @param {!(Object|string|Array<string, object>|ParamDefinition)} paramDef
+   * @param {!(Object|string|Array<string, object>|sjs.ParamDefinition)} paramDef
    * @param {string} paramName Name of parameter
-   * @returns {ParamDefinition}
+   * @returns {sjs.ParamDefinition}
    * 
    * @private
    */
@@ -27,7 +27,7 @@
   /**
    * Calls 'isValidWith' for the supplied ParamDefinition
    * 
-   * @param  {Array} paramDef An array where the first element is a ParamDefinition
+   * @param  {Array} paramDef An array where the first element is a {@link sjs.ParamDefinition}
    * and the second element is the value to check the ParamDefintion against
    * @return {boolean} True if the value matches the supplied ParamDefinition (throws otherwise)
    * @throws {TypeError} If the value does not match the supplied ParamDefinition
@@ -50,7 +50,7 @@
    * @param  {Object | Object[]} params Descriptions of the types of all of the parameters within the method
    * (or just the parameters you would like checked)
    * @param  {function} method The method whose parameters will be checked
-   * @param  {Object} [context=null] Value to use as `this` when executing callback.
+   * @param  {Object} [context=null] Value to use as `this` when executing the method.
    * @param  {string} methodName Assign name of returned method
    * @return {function} a wrapped method of the function passed in that does
    * type checking of all of the parameter definitions passed in.
