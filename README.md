@@ -33,27 +33,99 @@ The `sjs.func` method will wrap the function passed to it that will check the ty
 Parameter definitions can be represented in many ways.
 
 1. **A string**: This is a string describing one of the following primitive JavaScript types: element, array, object, function, string, number, boolean, date, regexp.
-  * e.g. `{ param1: 'string' }`
+  * e.g. 
+
+        ```javascript
+        sjs.func({ 
+          param1: 'string' 
+        }, function(param1...
+        ```
 2. **A "Class" object**: This will make `sjs.func` check to ensure that the parameter value is an instance of the passed in object.
-  * e.g. `{ param1: Array }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: Array
+        }, function(param1...
+        ```
 3. **An array of 1 and/or 2**: This will ensure that the parameter value matches at least one of the given types
-  * e.g. `{ param1: ['string', Array ] }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: ['string', Array],
+        }, function(param1...
+        ```
 4. **An object with 1, 2 or 3 under a `types` property**: This will allow [additional properties](#additional-properties) to be added to the parameter defintion.
-  * e.g. `{ param1: { types: ['string', Array] } }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: {
+            types: ['string', Array],
+            ...
+          }
+        }, function(param1...
+        ```
 5. **An instance of a `sjs.ParamDefinition` object**: This is a special class that all of the above parameter defintions will ultimately get converted to. It contains the types the parameter is allowed to be, along with it's name and any [additional properties](#additional-properties) described below. Any of the above representations of a parameter definition can be passed into the constructor of `sjs.ParamDefinition`
-  * e.g. `{ param1: new sjs.ParamDefintion([ 'string', Array ]) }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: new sjs.ParamDefinition({
+            types: ['string', Array],
+            ...
+          })
+        }, function(param1...
+        ```
 
 ######Additional Properties
 The parameter definitions following style **4** and **5** can have the following additional properties:
 
 1. **(Boolean)`allowUndefined`**: Whether the parameter is allowed to be `undefined`
-  * e.g. `{ param1: { types: 'string', allowUndefined: false } }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: {
+            types: 'string',
+            allowUndefined: false,
+          }
+        }, function(param1...
+        ```
 2. **(Boolean)`allowNull`**: Whether the parameter is allowed to be `null`
-  * e.g. `{ param1: new sjs.ParamDefinition({ types: 'string', allowNull: true }) }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: {
+            types: 'string',
+            allowNull: false,
+          }
+        }, function(param1...
+        ```
 3. **(Boolean)`allowEmpty`**: Whether the parameter is allowed to be empty
-  * e.g. `{ param1: { types: 'string', allowEmpty: true } }`
+  * e.g.
+
+        ```javascript
+        sjs.func({ 
+          param1: new sjs.ParamDefinition({
+            types: 'string',
+            allowEmpty: false,
+          })
+        }, function(param1...
+        ```
 4. **(String) `paramName`**: Override the name of the parameter that will get displayed in any error messages of incorrect types
   * e.g. `{ param1: { type: 'string', paramName: 'AnotherName' } }`
+
+        ```javascript
+        sjs.func({ 
+          param1: {
+            types: 'string',
+            paramName: 'anotherName',
+          }
+        }, function(param1...
+        ```
 
 ####Example
 
@@ -94,15 +166,6 @@ myFunction({}, 4, 'a string');
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 
 ###Roadmap
-
-#### ~~Allow defining in Global Namespace~~
-* ~~Allow `sjs.func` to be define wrapped functions in the global namespace.~~
-* ~~Not exactly a safe practice but should be allowed regardless.~~
-* Changed my mind on this one. It'll be more verbose (and it's better practice) for developers to do something like `window.myFunction = sjs.func(...)`
-
-#### ~~Allow defining types for objects within arrays~~
-* ~~Should allow passing in a `ParamDefinition`, a type, or a list of object types for objects within parameters that are of type "array"~~
-* ~~Should allow for nesting (i.e. types of objects within arrays within arrays)~~
 
 ####Position of Parameter Definitions
 * The `func` method should also allow parameter definitions to not be placed in the order the parameters are occuring in the function (i.e. by specifying a `pos` property to specify a position)
