@@ -48,7 +48,7 @@ Parameter definitions can be represented in many ways.
           param1: Array
         }, function(param1...
         ```
-3. **An array of 1 and/or 2**: This will ensure that the parameter value matches at least one of the given types
+3. **An array of styles 1 and/or 2**: This will ensure that the parameter value matches at least one of the given types
   * e.g.
 
         ```javascript
@@ -56,7 +56,7 @@ Parameter definitions can be represented in many ways.
           param1: ['string', Array],
         }, function(param1...
         ```
-4. **An object with 1, 2 or 3 under a `types` property**: This will allow [additional properties](#additional-properties) to be added to the parameter defintion.
+4. **Styles 1, 2 or 3 under a `types` property**: This will allow [additional properties](#additional-properties) to be added to the parameter defintion.
   * e.g.
 
         ```javascript
@@ -78,6 +78,35 @@ Parameter definitions can be represented in many ways.
           })
         }, function(param1...
         ```
+
+######Container Types
+To specify the types of objects inside an array (i.e. to check for an array for strings), place the parameter definition inside an array. e.g.
+
+```javascript
+var method = sjs.func({
+  param1: [['string', 'number']]
+}, function(param1) {
+  console.log("I ran!");
+});
+
+method(['a', 6, 7]);
+> "I ran!"
+```
+The above parameter definition for `param1` checks to see if `param1` is an array that contains either strings or numbers. To define a parameter definition with types of either an array of string or an array of numbers, two different parameter definitions need to be passed in. e.g.
+
+```javascript
+var method = sjs.func({
+  param1: [['string'], ['number']]
+}, function(param1) {
+  console.log("I ran!");
+});
+
+method(['a']);
+> "I ran!"
+
+method([6, 'a']);
+> "ParamDefinitionError: Error: parameter param1 has invalid types. Expected types: [[string], [number]]. Found type: object"
+```
 
 ######Additional Properties
 The parameter definitions following style **4** and **5** can have the following additional properties:
@@ -116,7 +145,7 @@ The parameter definitions following style **4** and **5** can have the following
         }, function(param1...
         ```
 4. **(String) `paramName`**: Override the name of the parameter that will get displayed in any error messages of incorrect types
-  * e.g. `{ param1: { type: 'string', paramName: 'AnotherName' } }`
+  * e.g.
 
         ```javascript
         sjs.func({ 
@@ -144,11 +173,11 @@ var myFunction = sjs.func({
 
 //will throw
 myFunction({}, 4, 'a string');
-"TypeError: [myFunction] Invalid type for parameter param1: Expected type(s): string, number. Found type: object"
+> "ParamDefinitionError: [myFunction] Error: parameter param1 has invalid types. Expected types: [string, number, MyCustomObject]. Found type: object"
 
 //will run
 myFunction('12', 'a string', document.createElement('div'));
-"I ran! 12 a string   <div></div>"
+> "I ran! 12 a string   <div></div>"
 ```
 With an array version of parameter definitions (to make creating functions from `sjs.func` seem less intrusive).
 
@@ -161,7 +190,7 @@ var myFunction = sjs.func(['string', 'number', 'element'], function myFunction(p
 
 //will throw
 myFunction({}, 4, 'a string');
-"TypeError: [CustomName] Invalid type for parameter 0: Expected type(s): string, number. Found type: object"
+> "ParamDefinitionError: [CustomName] Error: parameter 0 has invalid types. Expected types: [string]. Found type: object."
 ```
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 

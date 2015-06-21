@@ -23,11 +23,11 @@
    * @memberOf sjs.ParamDefinition
    */
   var ParamDefinitionError = function ParamDefinitionError(errorType, paramValue, paramDef, customMessage) {
-    var description = "Error: parameter";
+    var description = "Error: parameter ";
 
     if (paramDef instanceof ParamDefinition) {
       this.paramDef = paramDef;
-      description += ' ' + this.paramDef.paramName;
+      description += this.paramDef.paramName + ' ';
     }
 
     switch(errorType) {
@@ -42,25 +42,21 @@
       this.errorType = ParamDefinitionError.TYPE_ERROR;
     }
 
-    description += ' ' + this.errorType;
+    description += this.errorType;
 
     if (this.paramDef) {
       this.paramValue = paramValue;
       this.foundTypes = typeof(paramValue);
 
-      description += ' Expected types: ' + printTypes(this.paramDef.types) + '. Found type: ' + this.foundTypes;
+      description += ' Expected types: ' + printTypes(this.paramDef.types) + '. Found type: ' + this.foundTypes + '.';
     }
 
     if (_.isString(customMessage)) {
-      description += '. ' + customMessage;
+      description += ' ' + customMessage;
     }
 
     this._super.call(this, description);
     this.message = description;
-  };
-
-  ParamDefinitionError.toString = function ParamDefinitionError_toString() {
-    return 'ParamDefinitionError';
   };
 
   /**
@@ -116,6 +112,10 @@
    */
   ParamDefinitionError.prototype.methodName = '';
 
+  ParamDefinitionError.prototype.toString = function ParamDefinitionError_toString() {
+    return this.name;
+  };
+
   /**
    * Print types of a param definition. Recursive call that prints container types as well.
    * @param  {Array} types An array of types as defined in the sjs.ParamDefintion.types# property
@@ -133,6 +133,8 @@
 
       } else if (_.isObject(type) && type.subDef && (type.subDef instanceof ParamDefinition)) {
         typeString += printTypes(type.subDef.types);
+      } else {
+        typeString += (type.name || type.toString());
       }
 
       if (index !== types.length - 1) {

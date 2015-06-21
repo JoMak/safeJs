@@ -15,10 +15,6 @@
    */
   var Base = function Base() { };
 
-  Base.toString = function Base_toString() {
-    return this.name;
-  };
-
   Base.prototype._isLogging = true;
 
   Base.prototype.name = 'Base';
@@ -28,6 +24,10 @@
    * @property {boolean} [enableLogging=true]
    */
   Base.prototype.enableLogging = true;
+
+  Base.prototype.toString = function Base_toString() {
+    return this.name;
+  };
 
   /**
    * A wrapper for logging something related to that object
@@ -58,8 +58,8 @@
           try {
             this[prop] = props[prop];
           } catch (err) {
-            this.log('error', 'Could not add key: "' + key + '": ' + err.toString());
-            // throw ('Could not add key: "' + key + '": ' + err.toString());
+            this.log('error', 'Could not add property "' + prop + '": ' + err.toString());
+            // throw new Error('Could not add property "' + prop + '": ' + err.toString());
           }
         }
       }
@@ -83,9 +83,7 @@
       set: function Base_enableLogging_set(enable) {
         this.prototype.enableLogging = enable;
       }
-    },
-    
-    'toString': { writable: false }
+    }
   });
 
   Object.defineProperties(Base.prototype, {    
@@ -106,6 +104,7 @@
     },    
 
     'name': { writable: true },
+    'toString': { writable: true },
     'log': { writable: false },
     'addProperties': { writable: false },
 
