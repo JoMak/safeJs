@@ -6,12 +6,26 @@
     "source": {
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_",
-        "exlude": [ "bower_components/", "node_modules/", "mock.js", "out/", "tests/" ],
-        "include": [ "base/", "function/", "promise/", "sjs.js" ]
+        "exlude": [ 
+            "node_modules/", 
+            "mock.js", 
+            "docs/", 
+            "tests/" 
+        ],
+        "include": [ 
+            "lib/"
+        ]
     },
     "plugins": [],
     "templates": {
         "cleverLinks": false,
-        "monospaceLinks": false
+        "monospaceLinks": false,
+        "footer": "Created by Karim Piyar Ali",
+        "copyright": "2015"
+    },
+    "opts": {
+        "destination": "docs",
+        "recurse": true,
+        "private": true
     }
 }

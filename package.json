@@ -1,35 +1,40 @@
 {
-  "name": "safeJs",
+  "name": "safejs",
   "version": "1.0.0",
   "description": "JavaScript type safety and more!",
-  "main": "sjs.js",
+  "main": "lib/sjs.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests --require tests/helpers/chai.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KarimP/safeJs.git"
+    "url": "git+https://github.com/KarimP/safeJs.git"
   },
   "keywords": [
-    "js",
     "safe",
+    "js",
+    "javascript",
     "type",
-    "check",
-    "safeJs",
-    "JavaScript",
-    "javascript"
+    "checking"
   ],
   "author": "Karim Piyar Ali",
-  "license": "APL v.2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/KarimP/safeJs/issues"
   },
-  "homepage": "https://github.com/KarimP/safeJs",
+  "homepage": "https://github.com/KarimP/safeJs#readme",
   "devDependencies": {
-    "bower": "^1.3.12",
-    "grunt": "^0.4.5"
+    "chai": "~1.10.0",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.8.0",
+    "grunt-mocha-test": "^0.12.7",
+    "mocha": "^2.2.5",
+    "sinon": "^1.15.3"
+  },
+  "dependencies": {
+    "underscore": "^1.8.3"
   }
 }

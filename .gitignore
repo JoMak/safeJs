@@ -1,5 +1,4 @@
-bower_components/
-out/
+docs/
 node_modules/
 
 mock.js
