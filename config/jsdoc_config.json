@@ -7,13 +7,11 @@
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_",
         "exlude": [ 
-            "node_modules/", 
-            "mock.js", 
-            "docs/", 
-            "tests/" 
+            "./"
         ],
         "include": [ 
-            "lib/"
+            "lib/",
+            "README.md"
         ]
     },
     "plugins": [],

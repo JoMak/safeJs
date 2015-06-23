@@ -6,7 +6,7 @@ This javascript library is intended to provide some "safe" features to the javas
 For now, safeJs will introduce runtime type checking for javascript functions as well as providing an easy way to wrap promise callbacks with an appropriate context.
 
 ##Documentation
-**Note**: run `jsdoc -c ./jsdoc.json` to generate docs for all properties of the `sjs` object.
+**Note**: run `jsdoc -c ./config/jsdoc.json` inside the project root directory to generate API docs for all properties of the `sjs` object.
 
 Currently, only runtime parameter type checking, i.e. `sjs.func` is under implementation. Basic type checking is completed, however additional features (such as type checking for variadic parameters) still needs to be completed.
 
@@ -194,22 +194,31 @@ myFunction({}, 4, 'a string');
 ```
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 
-###Roadmap
+##Running
+###As a node module
+run `npm install --production` inside the root directory of the project and require `lib/sjs.js`
 
-####Position of Parameter Definitions
+###As a browser library
+The latest versions of the library should be under the `dist` folder. safeJs requires underscorejs as a dependency, however there is an `sjs-standalone` version which includes underscorejs.
+
+####Building
+1. Run `npm install` inside the root directory
+2. Run `grunt` inside the root directory to build safeJs for browsers. Alternatively you can run `grunt standalone` to generate a standalone version which includes dependencies such as underscorejs
+
+##Roadmap
+
+#####Position of Parameter Definitions
 * The `func` method should also allow parameter definitions to not be placed in the order the parameters are occuring in the function (i.e. by specifying a `pos` property to specify a position)
 
-####Variadic Parameter Definitions
+#####Variadic Parameter Definitions
 * Ideally, the `func` method should allow parameter definitions for variadic parameters (e.g. defining a parameter definition for all parameters after the third parameter).
 
-####Overlapping Parameter Definitions
+#####Overlapping Parameter Definitions
 * This feature would kind of be like the opposite of the *Variadic Parameter Definitions* feature: Allow for multiple parameter definitions to define the type of a single parameter.
 * Not sure if I want this to be a feature or not. Depends on how much overhead it ends up introducing...
 
-##Running
-Don't have any build tools like Grunt or Gulp set up for this project yet, so I recommend running `bower install` first to get all dependencies required for the library, and then looking at the order of the script imports in the `tests/test.html` file.
-
-Eventually I'll setup a build script. Ideally, I'd like to provide as much customization as possible to create custom 'sjs' libraries that only have the modules each user would like and wish to use.
+#####Better build script
+* Ideally, I'd like to provide as much customization as possible to create custom 'sjs' libraries that only have the modules each user would like and wish to use.
 
 ##Compatability
 Working on it...
