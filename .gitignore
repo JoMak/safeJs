@@ -2,4 +2,4 @@ docs/
 node_modules/
 
 mock.js
-mocha_results.js
+mocha_results.txt
