@@ -161,7 +161,7 @@ The parameter definitions following style **4** and **5** can have the following
 ```javascript
 var myFunction = sjs.func({
 	param1: {
-		types: ["string", "number", MyCustomObject],
+		types: [["string"], "number", MyCustomObject],
 		allowEmpty: false,
 		allowNull: true
 	},
@@ -172,25 +172,25 @@ var myFunction = sjs.func({
 }, this);
 
 //will throw
-myFunction({}, 4, 'a string');
-> "ParamDefinitionError: [myFunction] Error: parameter param1 has invalid types. Expected types: [string, number, MyCustomObject]. Found type: object"
+myFunction([6], 4, 'a string');
+> "ParamDefinitionError: [myFunction] Error: parameter param1 has invalid types. Expected types: [[string], number, MyCustomObject]. Found type: object"
 
 //will run
-myFunction('12', 'a string', document.createElement('div'));
-> "I ran! 12 a string   <div></div>"
+myFunction(['12'], 'a string', document.createElement('div'));
+> "I ran! ["12"] a string <div>​</div>​"
 ```
 With an array version of parameter definitions (to make creating functions from `sjs.func` seem less intrusive).
 
 ####Example
 
 ```javascript
-var myFunction = sjs.func(['string', 'number', 'element'], function myFunction(param1, param2, param3) {
+var myFunction = sjs.func([[['string']], 'number', 'element'], function myFunction(param1, param2, param3) {
     console.log('I ran!', param1, param2, param3);
 }, this, 'CustomName');
 
 //will throw
 myFunction({}, 4, 'a string');
-> "ParamDefinitionError: [CustomName] Error: parameter 0 has invalid types. Expected types: [string]. Found type: object."
+> "ParamDefinitionError: [CustomName] Error: parameter 0 has invalid types. Expected types: [[string]]. Found type: object."
 ```
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 
