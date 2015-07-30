@@ -34,7 +34,6 @@ module.exports = function(grunt) {
     },
 
     browserify: {
-
       options: {
         browserifyOptions: {
           standalone: 'sjs'
@@ -50,15 +49,17 @@ module.exports = function(grunt) {
         src: 'lib/sjs.js',
         dest: 'dist/sjs.js',
         options: {
-          exclude: 'underscore'
+          browserifyOptions: {
+            standalone: 'sjs',
+            ignore: ['**/underscore.js']
+          }
         }
       }
     },
 
     uglify: {
       options: {
-        banner: '/* <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
-        footer: '/* Copyright <%= pkg.author %> */',
+        banner: '/* Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n<%= pkg.name %> - v.<%= pkg.version %> - Built on <%= grunt.template.today("yyyy-mm-dd") %> */\n',
         screwIE8: true,
 
         mangle: {
@@ -112,7 +113,7 @@ module.exports = function(grunt) {
   grunt.registerTask('release', 'Release task.', function(opt) {
     grunt.task.run('test', 'build', 'build:standalone');
 
-    if (opt === "withDocs") {
+    if (opt === 'withDocs') {
       grunt.task.run('docs');
     }
   });

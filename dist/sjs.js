@@ -140,7 +140,7 @@
   module.exports = Base;
 })();
 
-},{"underscore":6}],2:[function(require,module,exports){
+},{"underscore":7}],2:[function(require,module,exports){
 /**
  * @file: ParamDefinition.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -507,7 +507,7 @@
   module.exports = ParamDefinition;
 })();
 
-},{"../base/Base.js":1,"./ParamDefinitionError.js":3,"underscore":6}],3:[function(require,module,exports){
+},{"../base/Base.js":1,"./ParamDefinitionError.js":3,"underscore":7}],3:[function(require,module,exports){
 /**
  * @file: ParamDefinitionError.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -689,7 +689,7 @@
   module.exports = ParamDefinitionError;
 })();
 
-},{"underscore":6}],4:[function(require,module,exports){
+},{"underscore":7}],4:[function(require,module,exports){
 /**
  * @file: func.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -776,7 +776,87 @@
   module.exports = func;
 })();
 
-},{"./ParamDefinition.js":2,"underscore":6}],5:[function(require,module,exports){
+},{"./ParamDefinition.js":2,"underscore":7}],5:[function(require,module,exports){
+/**
+ * @file: obj.js
+ * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
+ * @version: 1.0.0
+ */
+
+(function() {
+  "use strict";
+
+  var _ = require('underscore');
+
+  /**
+   * A wrapper for a JavaScript object with methods to reduce undefined or null errors
+   * @param {*} obj Anything
+   * @param {?sjs.SafeObject} [parent=null] parent A parent safe object
+   */
+  var SafeObject = function SafeObject(obj, parent) {
+
+    if (obj instanceof SafeObject) {
+      return obj;
+    }
+
+    this.val = obj;
+
+    if (parent instanceof SafeObject) {
+      this.parent = parent;
+    }
+  };
+
+  SafeObject.prototype.val = undefined;
+  SafeObject.prototype._parent = undefined;
+  SafeObject.prototype.parent = undefined;
+
+  SafeObject.prototype.isEmpty = function SafeObject_isEmpty() {
+    return _.isEmpty(this.val);
+  };
+
+  SafeObject.prototype.isNull = function SafeObject_isNull() {
+    return _.isNull(this.val);
+  };
+
+  SafeObject.prototype.isUndefined = function SafeObject_isUndefined() {
+    return _.isUndefined(this.val);
+  };
+
+  SafeObject.prototype.try = function SafeObject_try(property) {
+    if (_.isObject(this.val)) {
+      return new SafeObject(this.val[property], this);  
+    }
+
+    return new SafeObject({}, this);
+  };
+
+  SafeObject.prototype.propertyExists = function SafeObject_propertyExists(property) {
+    return (_.isObject(this.val) && this.val[property] != null);
+  };
+
+  SafeObject.prototype.childPropertyExists = function SafeObject_childPropertyExists(property) {
+
+  };
+
+  Object.defineProperties(SafeObject.prototype, {
+    'parent': {
+      get: function SafeObject_parent_get() {
+        if (!(this._parent instanceof SafeObject)) {
+          return new SafeObject(this._parent);
+        }
+        return this._parent;
+      },
+
+      set: function SafeObject_parent_set(parent) {
+        this._parent = new SafeObject(parent);
+      }
+    }
+  });
+
+  module.exports = SafeObject;
+})();
+
+},{"underscore":7}],6:[function(require,module,exports){
 /**
 * @file: sjs.js
 * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -796,6 +876,7 @@
     Base: require('./base/Base.js'),
     ParamDefinition: require('./function/ParamDefinition.js'),
     func: require('./function/func.js'),
+    SafeObject: require('./obj/SafeObject.js'),
 
     /**
      * enable or disable logging *globally* (i.e. for all instances of objects inherited from sjs.Base)
@@ -819,13 +900,14 @@
 
     'Base': { writable: false },
     'ParamDefinition': { writable: false },
-    'func': { writable: false }
+    'func': { writable: false },
+    'SafeObject': { writable: false }
   });
 
   module.exports = sjs;
 })();
 
-},{"./base/Base.js":1,"./function/ParamDefinition.js":2,"./function/func.js":4}],6:[function(require,module,exports){
+},{"./base/Base.js":1,"./function/ParamDefinition.js":2,"./function/func.js":4,"./obj/SafeObject.js":5}],7:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2375,5 +2457,5 @@
   }
 }.call(this));
 
-},{}]},{},[5])(5)
+},{}]},{},[6])(6)
 });
