@@ -1,4 +1,5 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.sjs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
 /**
  * @file: base.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -8,7 +9,7 @@
 (function() {
   "use strict";
 
-  var _ = require('underscore');
+  var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
 
   /**
    * Base object which all other objects (with constructors) will inherit from.
@@ -137,7 +138,9 @@
   module.exports = Base;
 })();
 
-},{"underscore":undefined}],2:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],2:[function(require,module,exports){
+(function (global){
 /**
  * @file: ParamDefinition.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -149,7 +152,7 @@
 
   var Base = require('../base/Base.js');
   var ParamDefinitionError = require('./ParamDefinitionError.js');
-  var _ = require('underscore');
+  var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
 
   var Defaults = {
     allowUndefined: false,
@@ -273,7 +276,8 @@
    * 
    * @param {*} value Value to check the parameter types and restrictions against
    * 
-   * @return {Boolean | sjs.ParamDefinition.ParamDefinitionError} True if the value given matches the parameter definition, ParamDefinitionError error otherwise
+   * @return {boolean} True if the value given matches the parameter definition
+   * @throws {sjs.ParamDefinitionError} If the value given does not match the parameter definition
    */
   ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
     //check for undefined, and null first
@@ -291,43 +295,30 @@
       return true;
     }
 
-    //check for types now
-    var isValid = false;
+    var isValid = this._types.some(function(type) {
+      if (type === '*') {
+        return true;
+      }
 
-    for (var i = 0; i < this._types.length; ++i) {
-      if (this._types[i] === '*') {
-        isValid = true;
+      if (_.isObject(type) && type.subDef && (type.subDef instanceof ParamDefinition) && _.isArray(value)) {
+
+        return value.every(function(val) {
+          try {
+            return type.subDef.isValidWith(val);
+            
+          } catch (e) {
+            return !(e instanceof ParamDefinitionError);
+          }
+        });
+
+      } else if (_.isString(type)) {
+        var isCheck = 'is' + type[0].toUpperCase() + type.substring(1).toLowerCase();
+        return (_.isFunction(_[isCheck]) && _[isCheck](value));
 
       } else {
-        if (_.isObject(this._types[i]) && this._types[i].container && this._types[i].subDef && (this._types[i].subDef instanceof ParamDefinition)) {
-
-          for (var j = 0; j < value.length; ++j) {
-            try {
-              isValid = this._types[i].subDef.isValidWith(value[j]);
-            } catch (e) {
-              isValid = !(e instanceof ParamDefinitionError);
-            }
-
-            if (!isValid) {
-              break;
-            }
-          }
-
-        } else if (_.isString(this._types[i])) {
-          var isCheck = 'is' + this._types[i][0].toUpperCase() + this._types[i].substring(1).toLowerCase();
-          if (_[isCheck]) {
-            isValid = _[isCheck](value);
-          }
-
-        } else {
-          isValid = (value instanceof this._types[i]);
-        }
+        return (value instanceof type);
       }
-
-      if (isValid) {
-        break;
-      }
-    }
+    });
 
     if (!isValid) {
       throw new ParamDefinitionError(ParamDefinitionError.TYPE_ERROR, value, this);
@@ -360,8 +351,9 @@
       set: function ParamDefinition_types_set(types) {
         if (types == null) {
           throw new TypeError('Property "types" cannot be null or undefined.');
+        }
 
-        } else if (!_.isArray(types)) {
+        if (!_.isArray(types)) {
           types = [types];
         }
 
@@ -374,15 +366,14 @@
           } else if (_.isUndefined(type)) {
             this.allowUndefined = true;
 
-          } else if (_.isArray(type)) {
+          } else if (_.isArray(type)) { // defining an array with subtypes for elements
             if (!_.isEmpty(type)) {
               this._types.push({
-                'container': 'array',
                 'subDef': new ParamDefinition(type)
               });
 
             } else {
-              throw new TypeError('object' + type + ' in array "types" cannot be empty. Please place valid types within the container to indicate valid subtypes of objects within the container or, put in just "array" to indicate the just the container type');
+              this._types.push('array');
             }
 
           } else if (_.isString(type) || _.isObject(type)) {
@@ -422,7 +413,9 @@
   module.exports = ParamDefinition;
 })();
 
-},{"../base/Base.js":1,"./ParamDefinitionError.js":3,"underscore":undefined}],3:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../base/Base.js":1,"./ParamDefinitionError.js":3}],3:[function(require,module,exports){
+(function (global){
 /**
  * @file: ParamDefinitionError.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -432,7 +425,7 @@
 (function() {
   "use strict";
 
-  var _ = require('underscore');
+  var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
   
   /**
    * Error thrown when an invalid value is checked with a ParamDefinition
@@ -604,7 +597,9 @@
   module.exports = ParamDefinitionError;
 })();
 
-},{"underscore":undefined}],4:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],4:[function(require,module,exports){
+(function (global){
 /**
  * @file: func.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -615,7 +610,7 @@
   "use strict";
 
   var ParamDefinition = require('./ParamDefinition.js');
-  var _ = require('underscore');
+  var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
 
   /**
    * Convert an Object, string or Array into an sjs.ParamDefinition object.
@@ -691,7 +686,9 @@
   module.exports = func;
 })();
 
-},{"./ParamDefinition.js":2,"underscore":undefined}],5:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./ParamDefinition.js":2}],5:[function(require,module,exports){
+(function (global){
 /**
  * @file: SafeObject.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -701,7 +698,7 @@
 (function() {
   "use strict";
 
-  var _ = require('underscore');
+  var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
 
   /**
    * A wrapper for a JavaScript object with methods to reduce undefined or null errors
@@ -771,7 +768,8 @@
   module.exports = SafeObject;
 })();
 
-},{"underscore":undefined}],6:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],6:[function(require,module,exports){
 /**
 * @file: sjs.js
 * @author: Karim Piyar Ali [karim.piyarali@gmail.com]

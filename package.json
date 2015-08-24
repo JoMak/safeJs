@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "JavaScript type safety and more!",
   "main": "lib/sjs.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
     "test": "grunt test"
   },
@@ -27,6 +24,8 @@
   },
   "homepage": "https://github.com/KarimP/safeJs#readme",
   "devDependencies": {
+    "browserify": "^11.0.1",
+    "browserify-shim": "^3.8.10",
     "chai": "~1.10.0",
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.8.0",
@@ -40,5 +39,8 @@
   },
   "dependencies": {
     "underscore": "^1.8.3"
+  },
+  "browserify-shim": {
+    "underscore": "global:_"
   }
 }

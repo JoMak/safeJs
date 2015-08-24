@@ -2,6 +2,8 @@ docs/
 node_modules/
 
 mock.js
-mock.html
+tests/browser/
+
+mocha_results.txt
 
 .jshintignore

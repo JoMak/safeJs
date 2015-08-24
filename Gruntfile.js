@@ -49,6 +49,7 @@ module.exports = function(grunt) {
         src: 'lib/sjs.js',
         dest: 'dist/sjs.js',
         options: {
+          transform: [ 'browserify-shim' ],
           exclude: ['underscore']
         }
       }
@@ -60,7 +61,7 @@ module.exports = function(grunt) {
         screwIE8: true,
 
         mangle: {
-          except: ['_', 'sjs', 'ParamDefinition', 'ParamDefinitionError']
+          except: ['_', 'sjs', 'func', 'ParamDefinition', 'ParamDefinitionError']
         }
       },
 
@@ -85,20 +86,17 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  // default
-  grunt.registerTask('default', ['jshint', 'mochaTest', 'browserify:main', 'uglify:main']);
-
   // builds
   grunt.registerTask('build', 'Build task.', function(opt) {
-    if (typeof(opt) === 'undefined') {
+    if (opt === 'main') {
       grunt.task.run('browserify:main', 'uglify:main');
 
     } else if (opt === "standalone") {
       grunt.task.run('browserify:standalone', 'uglify:standalone');
 
     } else {
-      grunt.log.error('Error, invalid option: ' + opt);
-      return false;
+      grunt.task.run('browserify:main', 'uglify:main');
+      grunt.task.run('browserify:standalone', 'uglify:standalone');
     }
   });
 
@@ -108,10 +106,13 @@ module.exports = function(grunt) {
 
   //release
   grunt.registerTask('release', 'Release task.', function(opt) {
-    grunt.task.run('test', 'build', 'build:standalone');
+    grunt.task.run('test', 'build');
 
     if (opt === 'withDocs') {
       grunt.task.run('docs');
     }
   });
+
+  // default
+  grunt.registerTask('default', 'release');
 };

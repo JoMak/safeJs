@@ -41,5 +41,5 @@
     √ original method has name
 
 
-  34 passing (62ms)
+  34 passing (63ms)
 
