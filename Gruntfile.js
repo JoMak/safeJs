@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     jshint: {
       files: ['lib/**/*.js', 'test/**/*.js'],
       options: {
-        jshintrc: 'config/jshint_config.json'
+        jshintrc: 'config/jshint/config.json'
       }
     },
 
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
         jsdoc: 'node_modules/.bin/jsdoc',
         options: {
           destination: 'docs',
-          configure: 'config/jsdoc_config.json'
+          configure: 'config/jsdoc/config.json'
         }
       }
     },
@@ -49,10 +49,7 @@ module.exports = function(grunt) {
         src: 'lib/sjs.js',
         dest: 'dist/sjs.js',
         options: {
-          browserifyOptions: {
-            standalone: 'sjs',
-            ignore: ['**/underscore.js']
-          }
+          exclude: ['underscore']
         }
       }
     },

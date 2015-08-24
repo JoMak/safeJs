@@ -1,0 +1,45 @@
+
+
+  Base
+    √ attach custom console
+    √ logging level: log
+    √ logging level: info
+    √ logging level: warn
+    √ logging level: error
+    √ enableLog for sjs.Base instances
+    √ enableLogging for sjs
+    √ addProperties
+
+  ParamDefinition
+    √ isValidWith: allowUndefined
+    √ isValidWith: allowNull
+    √ isValidWith: allowEmpty
+    √ isValidWith: allowUndefined, allowNull
+    √ isValidWith: allowUndefined, allowEmpty
+    √ isValidWith: allowNull, allowEmpty
+    √ isValidWith: null type
+    √ isValidWith: single argument, string type
+    √ isValidWith: multiple arguments, string types
+    √ isValidWith: single argument, object type
+    √ isValidWith: multiple arguments, object types
+    √ isValidWith: multiple arguments, object and string types
+    √ isValidWith: container object with string/object
+    √ isValidWith: container object with multiple string/object
+    √ isValidWith: container object with undefined and null
+
+  func
+    √ Parameter names in error messages
+    √ pass in ParamDefinition properties
+    √ pass in string types
+    √ pass in custom objects
+    √ pass in ParamDefinition objects
+    √ multiple args
+    √ pass in object, ParameterDefinition, string and ParameterDefinition properties
+    √ pass in array definition
+    √ pass in method context
+    √ pass in method name
+    √ original method has name
+
+
+  34 passing (62ms)
+

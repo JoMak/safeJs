@@ -3,4 +3,5 @@ node_modules/
 
 mock.js
 mock.html
-mocha_results.txt
+
+.jshintignore
