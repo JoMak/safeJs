@@ -195,15 +195,13 @@ myFunction({}, 4, 'a string');
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its parameter definition rather than the name of the parameter.
 
 ##Running
-###As a node module
-run `npm install --production` inside the root directory of the project and require `lib/sjs.js`
 
 ###As a browser library
-The latest versions of the library should be under the `dist` folder. safeJs requires underscorejs as a dependency, however there is an `sjs-standalone` version which includes underscorejs.
+The latest versions of the library should be under the `dist` folder. safeJs requires underscorejs as a dependency, however there is an `sjs-standalone` version which includes underscore.
 
 ####Building
 1. Run `npm install` inside the root directory
-2. Run `grunt` inside the root directory to build safeJs for browsers. Alternatively you can run `grunt standalone` to generate a standalone version which includes dependencies such as underscorejs
+2. Run `grunt` inside the root directory to build safeJs for browsers.
 
 ##Roadmap
 
