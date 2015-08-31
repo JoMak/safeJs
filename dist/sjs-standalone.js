@@ -139,7 +139,7 @@
 
 },{"underscore":7}],2:[function(require,module,exports){
 /**
- * @file: ParamDefinition.js
+ * @file: TypeDefinition.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
  * @version: 1.0.0
  */
@@ -148,7 +148,7 @@
   "use strict";
 
   var Base = require('../base/Base.js');
-  var ParamDefinitionError = require('./ParamDefinitionError.js');
+  var TypeDefinitionError = require('./TypeDefinitionError.js');
   var _ = require('underscore');
 
   var Defaults = {
@@ -161,7 +161,7 @@
    * Apply default properties for this object
    * 
    * @private
-   * @memberOf sjs.ParamDefinition.prototype
+   * @memberOf sjs.TypeDefinition.prototype
    */
   var applyDefaults = function applyDefaults(obj) {
     if (obj != null) {
@@ -175,7 +175,7 @@
    * Sets the default values for some properties of the object
    * @param {Object} newDefaults An object containing the new default values of the specified properties
    *
-   * @memberOf sjs.ParamDefinition
+   * @memberOf sjs.TypeDefinition
    */
   var setDefaults = function setDefaults(newDefaults) {
     for (var key in newDefaults) {
@@ -186,20 +186,20 @@
   };
 
   /**
-   * Defines the properties of a parameter,
+   * Defines the properties of a type,
    * specifically, the types they are allowed to be,
    * their positions, names as well as whether they are allowed be empty, null or undefined
    * 
-   * @param {?(Object|Array|string)} settings default values for the ParamDefinition object
+   * @param {?(Object|Array|string|sjs.TypeDefinition)} settings default values for the TypeDefinition object
    * It can either be an object containing the properites of the object or an array of objects
-   * or string (or a mix of objects or strings) describing the allowed types of the parameter
+   * or string (or a mix of objects or strings) describing the allowed types
    * 
    * @constructor
    * @extends {sjs.Base}
    * @memberOf sjs
    */
-  var ParamDefinition = function ParamDefinition(settings) {
-    if (settings instanceof ParamDefinition) {
+  var TypeDefinition = function TypeDefinition(settings) {
+    if (settings instanceof TypeDefinition) {
       return settings;
     }
 
@@ -214,80 +214,74 @@
     this.addProperties(settings);
   };
 
-  ParamDefinition.ParamDefinitionError = ParamDefinitionError;
+  TypeDefinition.TypeDefinitionError = TypeDefinitionError;
 
-  ParamDefinition.prototype = Object.create(Base.prototype);
+  TypeDefinition.prototype = Object.create(Base.prototype);
 
-  ParamDefinition.prototype.constructor = ParamDefinition;
+  TypeDefinition.prototype.constructor = TypeDefinition;
 
-  ParamDefinition.prototype._super = Base;
+  TypeDefinition.prototype._super = Base;
 
-  ParamDefinition.prototype.name = 'ParamDefinition';
+  TypeDefinition.prototype.name = 'TypeDefinition';
 
-  ParamDefinition.prototype._types = ['object'];
+  TypeDefinition.prototype._types = ['object'];
 
   /**
-   * Allow the parameter to be undefined
+   * Allow the type to be undefined
    * @property {boolean} [allowUndefined=false]
    */
-  ParamDefinition.prototype.allowUndefined = false;
+  TypeDefinition.prototype.allowUndefined = false;
 
   /**
-   * Allow the parameter to be null
+   * Allow the type to be null
    * @property {boolean} [allowNull=false]
    */
-  ParamDefinition.prototype.allowNull = false;
+  TypeDefinition.prototype.allowNull = false;
 
   /**
-   * Allow the parameter to be empty
+   * Allow the type to be empty
    * An 'empty' object is one defined by underscorejs' `_.isEmpty` method
    * @property {boolean} [allowEmpty=true]
    */
-  ParamDefinition.prototype.allowEmpty = true;
+  TypeDefinition.prototype.allowEmpty = true;
 
   /**
-   * Valid types the parameter is allowed to be
+   * Valid types
    * @property {!Array<string, object>} [types=['object']]
    */
-  ParamDefinition.prototype.types = ['object'];
+  TypeDefinition.prototype.types = ['object'];
 
   /**
-   * The position of a parameter in the method
-   * @property {number} [pos=NaN]
-   */
-  ParamDefinition.prototype.pos = NaN;
-
-  /**
-   * Name of the parameter
+   * Name of the object if the TypeDefinition is going to represent a single object
    * Used to display error messages
-   * @property {string} [paramName='']
+   * @property {string} [objectName='']
    */
-  ParamDefinition.prototype.paramName = '';
+  TypeDefinition.prototype.objectName = '';
 
-  ParamDefinition.prototype.toString = function ParamDefinition_toString() {
+  TypeDefinition.prototype.toString = function TypeDefinition_toString() {
     return this.name;
   };
 
   /**
-   * Check if the passed in object/value matches the parameter definition
+   * Check if the passed in object/value matches the type definition
    * 
-   * @param {*} value Value to check the parameter types and restrictions against
+   * @param {*} value Value to check this TypeDefinition's type and restrictions against
    * 
-   * @return {boolean} True if the value given matches the parameter definition
-   * @throws {sjs.ParamDefinitionError} If the value given does not match the parameter definition
+   * @return {boolean} True if the value given matches the type definition
+   * @throws {sjs.TypeDefinitionError} If the value given does not match the type definition
    */
-  ParamDefinition.prototype.isValidWith = function ParamDefinition_isValidWith(value) {
+  TypeDefinition.prototype.isValidWith = function TypeDefinition_isValidWith(value) {
     //check for undefined, and null first
     if (_.isUndefined(value)) {
       if (!this.allowUndefined) {
-        throw new ParamDefinitionError(ParamDefinitionError.UNDEFINED_ERROR, value, this);
+        throw new TypeDefinitionError(TypeDefinitionError.UNDEFINED_ERROR, value, this);
       }
       return true;
     }
 
     if (_.isNull(value)) {
       if (!this.allowNull) {
-        throw new ParamDefinitionError(ParamDefinitionError.NULL_ERROR, value, this);
+        throw new TypeDefinitionError(TypeDefinitionError.NULL_ERROR, value, this);
       }
       return true;
     }
@@ -297,14 +291,20 @@
         return true;
       }
 
-      if (_.isObject(type) && type.subDef && (type.subDef instanceof ParamDefinition) && _.isArray(value)) {
+      if (_.isFunction(type)) {
+        try {
+          return type.call(null, value);  
+        } catch (e) {
+        }
+
+      } else if (type.subDef && (type.subDef instanceof TypeDefinition) && _.isArray(value)) {
 
         return value.every(function(val) {
           try {
             return type.subDef.isValidWith(val);
             
           } catch (e) {
-            return !(e instanceof ParamDefinitionError);
+            return !(e instanceof TypeDefinitionError);
           }
         });
 
@@ -318,34 +318,34 @@
     });
 
     if (!isValid) {
-      throw new ParamDefinitionError(ParamDefinitionError.TYPE_ERROR, value, this);
+      throw new TypeDefinitionError(TypeDefinitionError.TYPE_ERROR, value, this);
     }
 
     //check for empty
     if (_.isEmpty(value) && !this.allowEmpty) {
-      throw new ParamDefinitionError(ParamDefinitionError.EMPTY_ERROR, value, this);
+      throw new TypeDefinitionError(TypeDefinitionError.EMPTY_ERROR, value, this);
     }
 
     return true;
   };
 
-  //property definitions
-  Object.defineProperties(ParamDefinition, {
+  // properties
+  Object.defineProperties(TypeDefinition, {
     'setDefaults': { 
       writable: false,
       value: setDefaults
     },
 
-    'ParamDefinitionError': { writable: false }
+    'TypeDefinitionError': { writable: false }
   });
 
-  Object.defineProperties(ParamDefinition.prototype, {
+  Object.defineProperties(TypeDefinition.prototype, {
     'types': {
-      get: function ParamDefinition_types_get() {
+      get: function TypeDefinition_types_get() {
         return this._types || ['object'];
       },
 
-      set: function ParamDefinition_types_set(types) {
+      set: function TypeDefinition_types_set(types) {
         if (types == null) {
           throw new TypeError('Property "types" cannot be null or undefined.');
         }
@@ -366,14 +366,14 @@
           } else if (_.isArray(type)) { // defining an array with subtypes for elements
             if (!_.isEmpty(type)) {
               this._types.push({
-                'subDef': new ParamDefinition(type)
+                'subDef': new TypeDefinition(type)
               });
 
             } else {
               this._types.push('array');
             }
 
-          } else if (_.isString(type) || _.isObject(type)) {
+          } else if (_.isString(type) || _.isObject(type) || _.isFunction(type)) {
 
             if (_.isString(type) && _.isEmpty(type)) {
               throw new TypeError(type + ' in array "types" cannot be empty.');
@@ -392,7 +392,7 @@
     'allowNull': { writable: true },
     'allowEmpty': { writable: true },
     'pos': { writable: true },
-    'paramName': { writable: true },
+    'objectName': { writable: true },
 
     'constructor': { writable: false },
     '_super': { writable: false },
@@ -407,12 +407,12 @@
     '_types': { writable: true }
   });
   
-  module.exports = ParamDefinition;
+  module.exports = TypeDefinition;
 })();
 
-},{"../base/Base.js":1,"./ParamDefinitionError.js":3,"underscore":7}],3:[function(require,module,exports){
+},{"../base/Base.js":1,"./TypeDefinitionError.js":3,"underscore":7}],3:[function(require,module,exports){
 /**
- * @file: ParamDefinitionError.js
+ * @file: TypeDefinitionError.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
  * @version: 1.0.0
  */
@@ -423,45 +423,45 @@
   var _ = require('underscore');
   
   /**
-   * Error thrown when an invalid value is checked with a ParamDefinition
+   * Error thrown when an invalid value is checked with a TypeDefinition
    * 
    * @param {string} errorType One of either: UNDEFINED_ERROR, NULL_ERROR, EMPTY_ERROR or TYPE_ERROR constants defined in the class object
    * @param {string} customMessage Any additional custom message along with the generated one.
-   * @param {*} paramValue Value of the parameter checked against the ParamDefinition
-   * @param {sjs.ParamDefinition} paramDef ParamDefinition the vale was checked against.
+   * @param {*} value Value checked against the TypeDefinition
+   * @param {sjs.TypeDefinition} typeDefinition TypeDefinition the value was checked against.
    *
    * @constructor
    * @extends {TypeError}
-   * @memberOf sjs.ParamDefinition
+   * @memberOf sjs.TypeDefinition
    */
-  var ParamDefinitionError = function ParamDefinitionError(errorType, paramValue, paramDef, customMessage) {
-    var description = "Error: parameter ";
+  var TypeDefinitionError = function TypeDefinitionError(errorType, value, typeDefinition, customMessage) {
+    var description = "Error: ";
 
-    this.paramDef = paramDef;
+    this.typeDefinition = typeDefinition;
 
-    if (_.isString(this.paramDef.paramName)) {
-      description += this.paramDef.paramName + ' ';
+    if (_.isString(this.typeDefinition.objectName)) {
+      description += 'Object: ' + this.typeDefinition.objectName + ' ';
     }
 
     switch(errorType) {
-      case ParamDefinitionError.UNDEFINED_ERROR:
-      case ParamDefinitionError.NULL_ERROR:
-      case ParamDefinitionError.EMPTY_ERROR:
-      case ParamDefinitionError.TYPE_ERROR:
+      case TypeDefinitionError.UNDEFINED_ERROR:
+      case TypeDefinitionError.NULL_ERROR:
+      case TypeDefinitionError.EMPTY_ERROR:
+      case TypeDefinitionError.TYPE_ERROR:
       this.errorType = errorType;
       break;
 
       default:
-      this.errorType = ParamDefinitionError.TYPE_ERROR;
+      this.errorType = TypeDefinitionError.TYPE_ERROR;
     }
 
     description += this.errorType;
 
-    if (_.isArray(this.paramDef.types) && this.errorType === ParamDefinitionError.TYPE_ERROR) {
-      this.paramValue = paramValue;
-      this.foundTypes = typeof(paramValue);
+    if (_.isArray(this.typeDefinition.types) && this.errorType === TypeDefinitionError.TYPE_ERROR) {
+      this.value = value;
+      this.foundTypes = typeof(value);
 
-      description += ' Expected types: ' + printTypes(this.paramDef.types) + '. Found type: ' + this.foundTypes + '.';
+      description += ' Expected types: ' + printTypes(this.typeDefinition.types) + '. Found type: ' + this.foundTypes + '.';
     }
 
     if (_.isString(customMessage)) {
@@ -478,7 +478,7 @@
    *
    * @constant
    */
-  ParamDefinitionError.UNDEFINED_ERROR = 'cannot be undefined.';
+  TypeDefinitionError.UNDEFINED_ERROR = 'cannot be undefined.';
 
   /**
    * A null error
@@ -486,7 +486,7 @@
    *
    * @constant
    */
-  ParamDefinitionError.NULL_ERROR = 'cannot be null.';
+  TypeDefinitionError.NULL_ERROR = 'cannot be null.';
 
   /**
    * An empty error
@@ -494,7 +494,7 @@
    *
    * @constant
    */
-  ParamDefinitionError.EMPTY_ERROR = 'cannot be emtpy.';
+  TypeDefinitionError.EMPTY_ERROR = 'cannot be emtpy.';
 
   /**
    * An invalid type error
@@ -502,20 +502,20 @@
    *
    * @constant
    */
-  ParamDefinitionError.TYPE_ERROR = 'has invalid types.';
+  TypeDefinitionError.TYPE_ERROR = 'has invalid types.';
 
-  ParamDefinitionError.prototype =  Object.create(TypeError.prototype);
+  TypeDefinitionError.prototype =  Object.create(TypeError.prototype);
 
-  ParamDefinitionError.prototype.constructor = ParamDefinitionError;
+  TypeDefinitionError.prototype.constructor = TypeDefinitionError;
 
-  ParamDefinitionError.prototype._super = TypeError;
+  TypeDefinitionError.prototype._super = TypeError;
 
-  ParamDefinitionError.prototype.name = 'ParamDefinitionError';
+  TypeDefinitionError.prototype.name = 'TypeDefinitionError';
 
-  ParamDefinitionError.prototype._methodName = '';
+  TypeDefinitionError.prototype._methodName = '';
 
   /**
-   * Name of the method that owns the parameter that the ParamDefinitionError occured in.
+   * Name of the method that the TypeDefinitionError occured in.
    * The method name will be prepended to the error message
    * This is mainly used by {@link sjs.func} to show the method name when showing the type error
    * 
@@ -523,21 +523,21 @@
    *
    * @optional
    */
-  ParamDefinitionError.prototype.methodName = '';
+  TypeDefinitionError.prototype.methodName = '';
 
-  ParamDefinitionError.prototype.toString = function ParamDefinitionError_toString() {
+  TypeDefinitionError.prototype.toString = function TypeDefinitionError_toString() {
     return this.name;
   };
 
   /**
    * Print types of a param definition. Recursive call that prints container types as well.
-   * @param  {Array} types An array of types as defined in the sjs.ParamDefintion.types# property
+   * @param  {Array} types An array of types as defined in the sjs.TypeDefinition.types# property
    * @return {string} A string representation of the types
    *
    * @private
-   * @memberOf sjs.ParamDefinition.ParamDefinitionError
+   * @memberOf sjs.TypeDefinition.TypeDefinitionError
    */
-  var printTypes = function ParamDefinitionError_printTypes(types) {
+  var printTypes = function TypeDefinitionError_printTypes(types) {
     var typeString = '[';
 
     types.forEach(function(type, index) {
@@ -560,7 +560,7 @@
   };
 
   //property definitions
-  Object.defineProperties(ParamDefinitionError, { 
+  Object.defineProperties(TypeDefinitionError, { 
     'UNDEFINED_ERROR': { writable: false },
     'NULL_ERROR': { writable: false },
     'EMPTY_ERROR': { writable: false },
@@ -570,13 +570,13 @@
     '_super': { writable: false }
   });
 
-  Object.defineProperties(ParamDefinitionError.prototype, {
+  Object.defineProperties(TypeDefinitionError.prototype, {
     'methodName': {
-      get: function ParamDefinitionError_methodName_get() {
+      get: function TypeDefinitionError_methodName_get() {
         return this._methodName;
       },
 
-      set: function ParamDefinitionError_methodName_set(methodName) {
+      set: function TypeDefinitionError_methodName_set(methodName) {
         this._methodName = methodName;
 
         if (_.isString(this._methodName) && !_.isEmpty(this._methodName)) {
@@ -589,7 +589,7 @@
     'name': { writable: true }
   });
 
-  module.exports = ParamDefinitionError;
+  module.exports = TypeDefinitionError;
 })();
 
 },{"underscore":7}],4:[function(require,module,exports){
@@ -602,40 +602,40 @@
 (function() {
   "use strict";
 
-  var ParamDefinition = require('./ParamDefinition.js');
+  var TypeDefinition = require('./TypeDefinition.js');
   var _ = require('underscore');
 
   /**
-   * Convert an Object, string or Array into an sjs.ParamDefinition object.
+   * Convert an Object, string or Array into an sjs.TypeDefinition object.
    * 
-   * @param {!(Object|string|Array<string, object>|sjs.ParamDefinition)} paramDef
+   * @param {!(Object|string|Array<string, object>|sjs.TypeDefinition)} typeDefinition
    * @param {string} paramName Name of parameter
-   * @returns {sjs.ParamDefinition}
+   * @returns {sjs.TypeDefinition}
    * 
    * @private
    */
-  var getParamDefinition = function func_getParamDefinition(paramDef, paramName) { 
-    paramDef = new ParamDefinition(paramDef);
-    paramDef.paramName = paramName.toString();
-    return paramDef;
+  var getTypeDefinition = function func_getTypeDefinition(typeDefinition, paramName) { 
+    typeDefinition = new TypeDefinition(typeDefinition);
+    typeDefinition.objectName = paramName.toString();
+    return typeDefinition;
   };
 
   /**
-   * Calls 'isValidWith' for the supplied ParamDefinition
+   * Calls 'isValidWith' for the supplied TypeDefinition
    * 
-   * @param  {Array} paramDef An array where the first element is a {@link sjs.ParamDefinition}
-   * and the second element is the value to check the ParamDefintion against
-   * @return {boolean} True if the value matches the supplied ParamDefinition (throws otherwise)
-   * @throws {TypeError} If the value does not match the supplied ParamDefinition
+   * @param  {Array} typeDefinition An array where the first element is a {@link sjs.TypeDefinition}
+   * and the second element is the value to check the TypeDefinition against
+   * @return {boolean} True if the value matches the supplied TypeDefinition (throws otherwise)
+   * @throws {TypeError} If the value does not match the supplied TypeDefinition
    * 
    * @private
    */
-  var checkType = function func_checkType(paramDef) {
+  var checkType = function func_checkType(typeDefinition) {
     try {
-      return paramDef[0].isValidWith(paramDef[1]);
+      return typeDefinition[0].isValidWith(typeDefinition[1]);
 
     } catch (e) {
-      if (e instanceof ParamDefinition.ParamDefinitionError) {
+      if (e instanceof TypeDefinition.TypeDefinitionError) {
         e.methodName = this.name;
         throw e;
       }
@@ -656,14 +656,14 @@
    */
   var func = function func(params, method, context, methodName) {
     if (!_.isObject(params)) {
-      throw new TypeError('Parameter definitions must be of type: "Object" or "Array"');
+      throw new TypeError('Type definitions must be of type: "Object" or "Array"');
     }
 
     if (!_.isObject(context)) {
       context = null;
     }
 
-    var paramDefns = _.map(params, getParamDefinition);
+    var paramDefns = _.map(params, getTypeDefinition);
 
     return _.wrap(method, function(origMethod) {
       var args = Array.prototype.slice.call(arguments, 1);
@@ -679,7 +679,7 @@
   module.exports = func;
 })();
 
-},{"./ParamDefinition.js":2,"underscore":7}],5:[function(require,module,exports){
+},{"./TypeDefinition.js":2,"underscore":7}],5:[function(require,module,exports){
 /**
  * @file: SafeObject.js
  * @author: Karim Piyar Ali [karim.piyarali@gmail.com]
@@ -777,7 +777,7 @@
   var sjs = {
 
     Base: require('./base/Base.js'),
-    ParamDefinition: require('./function/ParamDefinition.js'),
+    TypeDefinition: require('./function/TypeDefinition.js'),
     func: require('./function/func.js'),
     SafeObject: require('./obj/SafeObject.js'),
 
@@ -802,7 +802,7 @@
     },
 
     'Base': { writable: false },
-    'ParamDefinition': { writable: false },
+    'TypeDefinition': { writable: false },
     'func': { writable: false },
     'SafeObject': { writable: false }
   });
@@ -810,7 +810,7 @@
   module.exports = sjs;
 })();
 
-},{"./base/Base.js":1,"./function/ParamDefinition.js":2,"./function/func.js":4,"./obj/SafeObject.js":5}],7:[function(require,module,exports){
+},{"./base/Base.js":1,"./function/TypeDefinition.js":2,"./function/func.js":4,"./obj/SafeObject.js":5}],7:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

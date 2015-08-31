@@ -8,7 +8,7 @@
  */
 (function() {
   "use strict";
-  var sjs = require('../lib/sjs.js');
+  var sjs = require('../dist/sjs-standalone.min.js');
   var sinon = require('sinon');
 
   /*
@@ -80,39 +80,39 @@
 
     it('enableLog for sjs.Base instances', function() {
       var base = new sjs.Base();
-      var paramDef = new sjs.ParamDefinition();
+      var typeDefinition = new sjs.TypeDefinition();
 
       base.enableLogging = false;
       base.log('log', 'test'); //this should not log
-      paramDef.log('log', 'test'); //this should log
+      typeDefinition.log('log', 'test'); //this should log
       consoleCount.log++;
       base.enableLogging = true;
 
-      paramDef.enableLogging = false;
-      paramDef.log('log', 'test'); //this should not log
+      typeDefinition.enableLogging = false;
+      typeDefinition.log('log', 'test'); //this should not log
       base.log('log', 'test'); //this should log
       consoleCount.log++;       
       expect(sjs.Base.console.log.callCount, 'check with log count').to.equal(consoleCount.log);
 
-      paramDef.enableLogging = true;
+      typeDefinition.enableLogging = true;
     });
 
     it ('enableLogging for sjs', function() {
       var base = new sjs.Base();
-      var paramDef = new sjs.ParamDefinition();
+      var typeDefinition = new sjs.TypeDefinition();
 
       sjs.enableLogging = false;
       base.log('log', 'test'); //this should not log
-      paramDef.log('log', 'test'); //this should not log
+      typeDefinition.log('log', 'test'); //this should not log
 
       base.enableLogging = true;
       base.log('log', 'test'); //this should log
       consoleCount.log++;
-      paramDef.log('log', 'test'); //this should not log
+      typeDefinition.log('log', 'test'); //this should not log
 
       sjs.enableLogging = true;
       base.log('log', 'test'); //this should log
-      paramDef.log('log', 'test'); //this should log
+      typeDefinition.log('log', 'test'); //this should log
       consoleCount.log += 2;
 
       expect(sjs.Base.console.log.callCount, 'check with log count').to.equal(consoleCount.log);
@@ -120,22 +120,22 @@
 
     it ('addProperties', function() {
       var base = new sjs.Base();
-      var paramDef = new sjs.ParamDefinition();
+      var typeDefinition = new sjs.TypeDefinition();
 
       base.addProperties({
         enableLogging: false
       });     
 
-      paramDef.addProperties({
+      typeDefinition.addProperties({
         name: 'test',
         allowNull: true,
         allowEmpty: false
       });
 
       expect(base.enableLogging).to.be.false;
-      expect(paramDef.name).to.equal('test');
-      expect(paramDef.allowNull).to.be.true;
-      expect(paramDef.allowEmpty).to.be.false;
+      expect(typeDefinition.name).to.equal('test');
+      expect(typeDefinition.allowNull).to.be.true;
+      expect(typeDefinition.allowEmpty).to.be.false;
     });
 
     after(function() {

@@ -9,13 +9,13 @@
 (function() {
   "use strict";
   
-  var sjs = require('../lib/sjs.js');
+  var sjs = require('../dist/sjs-standalone.min.js');
   var _ = require('underscore');
 
   describe('func', function() {
     var func = sjs.func;
 
-    it('Parameter names in error messages', function() {
+    it('TypeDefinition objectName in error messages', function() {
       var testFunction = sjs.func({param1: 'string'}, function(param1) {});
       expect(_.partial(testFunction, 6)).to.throw(TypeError, /param1/);
 
@@ -24,7 +24,7 @@
       expect(_.partial(testFunction, 6)).to.throw(TypeError, /0/);
     });
 
-    it('pass in ParamDefinition properties', function() {
+    it('pass in TypeDefinition properties', function() {
       var testFunction = sjs.func({
         param1: {
           types: ["string", "number", Error],
@@ -81,19 +81,19 @@
       expect(_.partial(testFunction, 9)).to.throw(TypeError);
     });
 
-    it('pass in ParamDefinition objects', function() {
-      var paramDef = new sjs.ParamDefinition();
-      paramDef.allowNull = true;
-      paramDef.types = 'string';
+    it('pass in TypeDefinition objects', function() {
+      var typeDefinition = new sjs.TypeDefinition();
+      typeDefinition.allowNull = true;
+      typeDefinition.types = 'string';
 
-      var testFunction = sjs.func({param1: paramDef}, function(param1) {});
+      var testFunction = sjs.func({param1: typeDefinition}, function(param1) {});
 
       expect(_.partial(testFunction, '')).to.not.throw();
       expect(_.partial(testFunction, null)).to.not.throw();
       expect(_.partial(testFunction, 6)).to.throw(TypeError);
 
       //now array
-      testFunction = sjs.func([paramDef], function(param1) {});
+      testFunction = sjs.func([typeDefinition], function(param1) {});
 
       expect(_.partial(testFunction, '')).to.not.throw();
       expect(_.partial(testFunction, null)).to.not.throw();
@@ -111,13 +111,13 @@
 
       //now array
       testFunction = sjs.func(['string', Error, 'number'], function(param1) {});
-      expect(_.partial(testFunction, '', new TypeError(), '')).to.throw(TypeError, /parameter 2/);
+      expect(_.partial(testFunction, '', new TypeError(), '')).to.throw(TypeError, /Object: 2/);
     });
 
     it('pass in object, ParameterDefinition, string and ParameterDefinition properties', function() {
-      var paramDef = new sjs.ParamDefinition();
-      paramDef.allowNull = true;
-      paramDef.types = 'string';
+      var typeDefinition = new sjs.TypeDefinition();
+      typeDefinition.allowNull = true;
+      typeDefinition.types = 'string';
 
       var testFunction = sjs.func({
         param1: {
@@ -126,7 +126,7 @@
         },
         param2: 'string',
         param3: Error,
-        param4: paramDef
+        param4: typeDefinition
       }, function(param1, param2, param3, param4) {});
 
       expect(_.partial(testFunction, undefined, '', new TypeError(), null)).to.not.throw();
@@ -138,7 +138,7 @@
         },
         'string',
         Error,
-        paramDef
+        typeDefinition
       ], function(param1) {});
 
       expect(_.partial(testFunction, undefined, '', new TypeError(), null)).to.not.throw();
@@ -150,13 +150,13 @@
       }, function(param1) {});
 
       expect(_.partial(testFunction, ['a', 'b'])).to.not.throw();
-      expect(_.partial(testFunction, ['a', 6])).to.throw(sjs.ParamDefinition.ParamDefinitionError);
+      expect(_.partial(testFunction, ['a', 6])).to.throw(sjs.TypeDefinition.TypeDefinitionError);
 
       //now array
       testFunction = sjs.func([[['string']]], function(param1) {});
 
       expect(_.partial(testFunction, ['a', 'b'])).to.not.throw();
-      expect(_.partial(testFunction, ['a', 6])).to.throw(sjs.ParamDefinition.ParamDefinitionError);
+      expect(_.partial(testFunction, ['a', 6])).to.throw(sjs.TypeDefinition.TypeDefinitionError);
     });
 
     it('pass in method context', function() {

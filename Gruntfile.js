@@ -61,7 +61,7 @@ module.exports = function(grunt) {
         screwIE8: true,
 
         mangle: {
-          except: ['_', 'sjs', 'func', 'ParamDefinition', 'ParamDefinitionError']
+          except: ['_', 'sjs', 'func', 'TypeDefinition', 'TypeDefinitionError']
         }
       },
 
@@ -106,7 +106,7 @@ module.exports = function(grunt) {
 
   //release
   grunt.registerTask('release', 'Release task.', function(opt) {
-    grunt.task.run('test', 'build');
+    grunt.task.run('build', 'test');
 
     if (opt === 'withDocs') {
       grunt.task.run('docs');
