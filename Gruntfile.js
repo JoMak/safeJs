@@ -16,7 +16,11 @@ module.exports = function(grunt) {
         options: {
           ui: 'bdd',
           reporter: 'spec',
-          require: 'tests/helpers/chai',
+          require: [
+            'tests/helpers/chai',
+            'tests/helpers/sinon',
+            'tests/helpers/sjs'
+          ],
           captureFile: 'mocha_results.txt'
         },
         src: ['tests/**/*.test.js']

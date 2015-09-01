@@ -8,8 +8,6 @@
  */
 (function() {
   "use strict";
-  var sjs = require('../dist/sjs-standalone.min.js');
-  var sinon = require('sinon');
 
   /*
   *********BASE*********

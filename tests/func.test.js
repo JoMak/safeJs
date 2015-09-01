@@ -8,9 +8,6 @@
  */
 (function() {
   "use strict";
-  
-  var sjs = require('../dist/sjs-standalone.min.js');
-  var _ = require('underscore');
 
   describe('func', function() {
     var func = sjs.func;

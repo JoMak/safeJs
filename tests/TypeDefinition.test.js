@@ -9,9 +9,6 @@
 (function() {
   "use strict";
 
-  var sjs = require('../dist/sjs-standalone.min.js');
-  var _ = require('underscore');
-
   describe('TypeDefinition', function() {
     var TypeDefinition = sjs.TypeDefinition;
 

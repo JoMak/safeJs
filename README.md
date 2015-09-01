@@ -213,12 +213,12 @@ The latest versions of the library should be under the `dist` folder. safeJs req
 
 Browser Compatability was checked using [JavaScript Compatibility Checker](http://jscc.info/).
 
-###Desktop
+####Desktop
 | IE | Chrome | Firefox | Opera | Safari |
 |:--:|:------:|:-------:|:-----:|:------:|
 |10+ | 11+    | 4+      | 12+   | 5.1+   |
 
-###Mobile
+####Mobile
 | Opera Mini | iOS Safari |
 |:----------:|:----------:|
 | 5.0+       | 7.0+       |
