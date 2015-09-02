@@ -1,8 +1,9 @@
 {
     "tags": {
         "allowUnknownTags": true,
-        "dictionaries": ["jsdoc","closure"]
+        "dictionaries": ["jsdoc", "closure"]
     },
+
     "source": {
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_",
@@ -14,16 +15,18 @@
             "README.md"
         ]
     },
-    "plugins": [],
+
+    "plugins": [
+        "plugins/markdown"
+    ],
+
     "templates": {
         "cleverLinks": false,
-        "monospaceLinks": false,
-        "footer": "Created by Karim Piyar Ali",
-        "copyright": "2015"
+        "monospaceLinks": false
     },
+
     "opts": {
-        "destination": "docs",
         "recurse": true,
-        "private": true
+        "private": false
     }
 }

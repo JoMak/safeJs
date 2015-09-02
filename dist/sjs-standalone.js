@@ -160,8 +160,8 @@
   /**
    * Apply default properties for this object
    * 
-   * @private
    * @memberOf sjs.TypeDefinition.prototype
+   * @private
    */
   var applyDefaults = function applyDefaults(obj) {
     if (obj != null) {
@@ -659,9 +659,7 @@
       throw new TypeError('Type definitions must be of type: "Object" or "Array"');
     }
 
-    if (!_.isObject(context)) {
-      context = null;
-    }
+    context = context || null;
 
     var paramDefns = _.map(params, getTypeDefinition);
 
@@ -782,9 +780,8 @@
     SafeObject: require('./obj/SafeObject.js'),
 
     /**
-     * enable or disable logging *globally* (i.e. for all instances of objects inherited from sjs.Base)
-     * Note: this *does not* disable logging from instances which have manually enabled logging themselves
-     * @property {boolean} [enableLogging=true]
+     * @property {Boolean} enableLogging Enable or disable logging **globally** (i.e. for all instances of objects inherited from sjs.Base). Note: this **does not** disable logging from instances which have manually enabled logging themselves
+     * @memberOf sjs
      */
     enableLogging: true
 

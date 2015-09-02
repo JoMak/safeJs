@@ -4,6 +4,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    clean: {
+      release: [ 'dist' ],
+      docs: [ 'docs' ]
+    },
+
     jshint: {
       files: ['lib/**/*.js', 'test/**/*.js'],
       options: {
@@ -84,6 +89,7 @@ module.exports = function(grunt) {
   });
   
   // load plugins
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-jsdoc');
@@ -92,6 +98,8 @@ module.exports = function(grunt) {
 
   // builds
   grunt.registerTask('build', 'Build task.', function(opt) {
+    grunt.task.run('clean:release');
+
     if (opt === 'main') {
       grunt.task.run('browserify:main', 'uglify:main');
 
@@ -105,10 +113,10 @@ module.exports = function(grunt) {
   });
 
   // other
-  grunt.registerTask('docs', ['jsdoc']);
-  grunt.registerTask('test', [ 'jshint', 'mochaTest']);
+  grunt.registerTask('docs', ['clean:docs', 'jsdoc']);
+  grunt.registerTask('test', ['jshint', 'mochaTest']);
 
-  //release
+  // release
   grunt.registerTask('release', 'Release task.', function(opt) {
     grunt.task.run('build', 'test');
 
