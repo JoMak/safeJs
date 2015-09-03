@@ -1,9 +1,6 @@
 docs/
 node_modules/
-
-mock.js
 tests/browser/
 
+mock.js
 mocha_results.txt
-
-.jshintignore

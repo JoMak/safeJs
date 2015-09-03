@@ -132,20 +132,6 @@
       expect(_.partial(typeDefinition.isValidWith, ['2'])).to.throw(TypeError);
     });
 
-    it('isValidWith: single argment, function', function() {
-      var typeDefinition = new TypeDefinition(function(val) {
-        return val.hello && val.world;
-      });
-
-      var validObj = {
-        hello: 'testing',
-        world: 'testing'
-      };
-
-      expect(typeDefinition.isValidWith(validObj)).to.be.true;     
-      expect(_.partial(typeDefinition.isValidWith, {})).to.throw(TypeError);
-    });
-
   });
 
 })();

@@ -1,4 +1,4 @@
-var sjs = require('../../dist/sjs-standalone.min.js');
+var sjs = require('../../lib/sjs.js');
 var _ = require('underscore');
 
 global.sjs = sjs;

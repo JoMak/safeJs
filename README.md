@@ -49,23 +49,14 @@ Type definitions can be represented in many ways:
     }, function(param1...
     ```
 
-3. **A function**: This will make `sjs.func` pass in the parameter value to the method to determine if it meets the proper type requirements. The method must return a "truthy" value if the passed in value is the correct type and a "falsey" value otherwise. For example, the following type definition lets the method run if `param1` is an object that contains properties named "test" and "hi". e.g.
-    ```javascript
-    sjs.func({
-        param1: function(val) {
-            return val.test && val.hi;
-        }
-    }, function(param1...
-    ```
-
-4. **An array of styles 1, 2 and/or 3**: This will ensure that the parameter value matches at least one of the given types. e.g.
+3. **An array of styles 1 and/or 2**: This will ensure that the parameter value matches at least one of the given types. e.g.
     ```javascript
     sjs.func({ 
       param1: ['string', Array],
     }, function(param1...
     ```
 
-5. **Styles 1, 2, 3 or 4 under a `types` property inside an object**: This will allow [additional properties](# additional-properties) to be added to the parameter defintion. e.g.
+4. **Styles 1, 2, or 3 under a `types` property inside an object**: This will allow [additional properties](# additional-properties) to be added to the parameter defintion. e.g.
     ```javascript
     sjs.func({ 
       param1: {
@@ -76,7 +67,7 @@ Type definitions can be represented in many ways:
     }, function(param1...
     ```
 
-6. **An instance of an `sjs.TypeDefinition` object**: This is a special class that all of the above type defintions will ultimately get converted to. It contains the types the parameter is allowed to be, along with it's name and any [additional properties](# additional-properties) described below. Any of the above representations of a type definition can be passed into the constructor of `sjs.TypeDefinition`. e.g.
+5. **An instance of an `sjs.TypeDefinition` object**: This is a special class that all of the above type defintions will ultimately get converted to. It contains the types the parameter is allowed to be, along with it's name and any [additional properties](# additional-properties) described below. Any of the above representations of a type definition can be passed into the constructor of `sjs.TypeDefinition`. e.g.
     ```javascript
     sjs.func({ 
       param1: new sjs.TypeDefinition({

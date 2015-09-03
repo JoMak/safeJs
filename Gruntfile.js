@@ -118,7 +118,7 @@ module.exports = function(grunt) {
 
   // release
   grunt.registerTask('release', 'Release task.', function(opt) {
-    grunt.task.run('build', 'test');
+    grunt.task.run('test', 'build');
 
     if (opt === 'withDocs') {
       grunt.task.run('docs');

@@ -208,7 +208,7 @@
 
     this.applyDefaults(this);
     
-    if (_.isString(settings) || _.isArray(settings)) {
+    if (!_.isUndefined(settings) && _.isUndefined(settings.types)) {
       settings = { types: settings };
     }
 
@@ -291,14 +291,8 @@
       if (type === '*') {
         return true;
       }
-
-      if (_.isFunction(type)) {
-        try {
-          return type.call(null, value);  
-        } catch (e) {
-        }
-
-      } else if (type.subDef && (type.subDef instanceof TypeDefinition) && _.isArray(value)) {
+      
+      if (type.subDef && (type.subDef instanceof TypeDefinition) && _.isArray(value)) {
 
         return value.every(function(val) {
           try {
@@ -374,7 +368,7 @@
               this._types.push('array');
             }
 
-          } else if (_.isString(type) || _.isObject(type) || _.isFunction(type)) {
+          } else if (_.isString(type) || _.isObject(type)) {
 
             if (_.isString(type) && _.isEmpty(type)) {
               throw new TypeError(type + ' in array "types" cannot be empty.');
