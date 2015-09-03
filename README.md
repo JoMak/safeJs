@@ -1,5 +1,7 @@
 # SafeJs
 
+[![NPM](https://nodei.co/npm/safejs.png)](https://nodei.co/npm/safejs/)
+
 ## Description
 This JavaScript library provides some extra utility features such as type checking, polling tasks (comming soon) and possibly other features.
 
