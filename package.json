@@ -1,6 +1,6 @@
 {
   "name": "safejs",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "JavaScript type safety and more!",
   "main": "lib/sjs.js",
   "scripts": {
