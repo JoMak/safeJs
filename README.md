@@ -44,36 +44,45 @@ Type definitions can be represented in many ways:
     }, function(param1...
     ```
 
-2. **A "Class" object**: This will make `sjs.func` check that the parameter value is an instance of the passed in object. e.g.
+2. **A Prototype object**: This will make `sjs.func` check that the parameter value is an instance of the passed in object. For example, the following type definition lets the method run if `param1` is an object that is an instance of the `Error` object/class:
     ```javascript
-    sjs.func({ 
-      param1: Array
+    sjs.func({
+      param1: Error.prototype
     }, function(param1...
     ```
 
-3. **An array of styles 1 and/or 2**: This will ensure that the parameter value matches at least one of the given types. e.g.
+3. **A function**: This will make `sjs.func` pass in the parameter value to the method to determine if it meets the proper type requirements. The method must explicity return `true` if the passed in value is the correct type and `false` otherwise - truthy and falsey values won't work. For example, the following type definition lets the method run if `param1` is an object that contains properties named `test` and `hi`:
     ```javascript
-    sjs.func({ 
-      param1: ['string', Array],
+    sjs.func({
+      param1: function(val) {
+        return (!_.isUndefined(val.test) && ~_.isUndefined(val.hi));
+      }
     }, function(param1...
     ```
 
-4. **Styles 1, 2, or 3 under a `types` property inside an object**: This will allow [additional properties](# additional-properties) to be added to the parameter defintion. e.g.
+4. **An array of styles 1, 2 and/or 3**: This will ensure that the parameter value matches at least one of the given types. e.g.
+    ```javascript
+    sjs.func({ 
+      param1: ['string', Array.prototype],
+    }, function(param1...
+    ```
+
+5. **Styles 1, 2, 3 or 4 under a `types` property inside an object**: This will allow [additional properties](# additional-properties) to be added to the parameter defintion. e.g.
     ```javascript
     sjs.func({ 
       param1: {
-        types: ['string', Array],
+        types: ['string', Array.prototype],
         allowNull: true
         ...
       }
     }, function(param1...
     ```
 
-5. **An instance of an `sjs.TypeDefinition` object**: This is a special class that all of the above type defintions will ultimately get converted to. It contains the types the parameter is allowed to be, along with it's name and any [additional properties](# additional-properties) described below. Any of the above representations of a type definition can be passed into the constructor of `sjs.TypeDefinition`. e.g.
+6. **An instance of an `sjs.TypeDefinition` object**: This is a special class that all of the above type defintions will ultimately get converted to. It contains the types the parameter is allowed to be, along with it's name and any [additional properties](# additional-properties) described below. Any of the above representations of a type definition can be passed into the constructor of `sjs.TypeDefinition`. e.g.
     ```javascript
     sjs.func({ 
       param1: new sjs.TypeDefinition({
-        types: ['string', Array],
+        types: ['string', Array.prototype],
         ...
       })
     }, function(param1...
@@ -111,7 +120,7 @@ myMethod([6, 'a']);
 ###### Additional Properties
 The types definitions following style **4** and **5** can have the following additional properties:
 
-1. **(Boolean) `allowUndefined`**: Whether the parameter is allowed to be `undefined`. e.g.
+1. **(Boolean) `allowUndefined[=false]`**: Whether the parameter is allowed to be `undefined`. Alternatively, just `undefined` can be passed in as a type. e.g.
     ```javascript
     sjs.func({ 
       param1: {
@@ -121,7 +130,7 @@ The types definitions following style **4** and **5** can have the following add
     }, function(param1...
     ```
 
-2. **(Boolean) `allowNull`**: Whether the parameter is allowed to be `null`. e.g.
+2. **(Boolean) `allowNull[=false]`**: Whether the parameter is allowed to be `null`. Alternatively, just `null` can be passed in as a type. e.g.
     ```javascript
     sjs.func({ 
       param1: {
@@ -131,7 +140,7 @@ The types definitions following style **4** and **5** can have the following add
     }, function(param1...
     ```
 
-3. **(Boolean) `allowEmpty`**: Whether the parameter is allowed to be empty. e.g.
+3. **(Boolean) `allowEmpty[=true]`**: Whether the parameter is allowed to be empty. e.g.
     ```javascript
     sjs.func({ 
       param1: new sjs.TypeDefinition({
@@ -156,29 +165,31 @@ The types definitions following style **4** and **5** can have the following add
 ```javascript
 var myFunction = sjs.func({
 	param1: {
-		types: [["string"], "number", MyCustomObject],
+		types: [["string"], "number", MyCustomObject.prototype],
 		allowEmpty: false,
 		allowNull: true
 	},
 	param2: 'string',
-	param3: ['function', 'element']
+  // Note: passing in `null` and `undefined` is the same as setting `allowNull` and `allowUndefined` respectively
+	param3: ['function', null, undefined]
+
 }, function myFunction(param1, param2, param3) {
    console.log ('I ran!', param1, param2, param3);
 }, this);
 
 //will throw
 myFunction([6], 4, 'a string');
-> "TypeDefinitionError: [myFunction] Error: Object: param1 has invalid types. Expected types: [[string], number, MyCustomObject]. Found type: object"
+> "TypeDefinitionError: [myFunction] Error: Object: param1 has invalid types. Expected types: [[string], number, [object Object]]. Found type: object."
 
 //will run
-myFunction(['12'], 'a string', document.createElement('div'));
-> "I ran! ["12"] a string <div>​</div>​"
+myFunction(['12'], 'a string', function(){});
+> I ran! ["12"] a string function (){}
 ```
 
 There is also an array version to represent type definitions (to make creating functions from `sjs.func` seem less intrusive).
 
 ```javascript
-var myFunction = sjs.func([[['string']], 'number', 'element'], function myFunction(param1, param2, param3) {
+var myFunction = sjs.func([[['string']], 'number', 'function'], function myFunction(param1, param2, param3) {
     console.log('I ran!', param1, param2, param3);
 }, this, 'CustomName');
 
@@ -186,12 +197,13 @@ var myFunction = sjs.func([[['string']], 'number', 'element'], function myFuncti
 myFunction({}, 4, 'a string');
 > "TypeDefinitionError: [CustomName] Error: Object: 0 has invalid types. Expected types: [[string]]. Found type: object."
 ```
+
 The tradeoff with this method is that the error messages will only provide the index of the parameter that did not follow its type definition rather than the name of the parameter.
 
 ## Running
 
 ### As a browser library
-The latest versions of the library should be under the `dist` folder. safeJs requires underscorejs as a dependency, however there is an `sjs-standalone` version which includes underscore.
+The latest versions of the library are be under the `dist` folder. safeJs requires underscorejs as a dependency, however there is an `sjs-standalone` version which includes underscore.
 
 #### Building
 1. Run `npm install` inside the root directory

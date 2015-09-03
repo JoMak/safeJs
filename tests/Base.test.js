@@ -21,7 +21,7 @@
     };
 
     before(function() {
-      //create a stub console object so we know if its being called
+      // create a stub console object so we know if its being called
       sjs.Base.console = {
         log: sinon.spy(),
         info: sinon.spy(),
@@ -81,14 +81,14 @@
       var typeDefinition = new sjs.TypeDefinition();
 
       base.enableLogging = false;
-      base.log('log', 'test'); //this should not log
-      typeDefinition.log('log', 'test'); //this should log
+      base.log('log', 'test'); // this should not log
+      typeDefinition.log('log', 'test'); // this should log
       consoleCount.log++;
       base.enableLogging = true;
 
       typeDefinition.enableLogging = false;
-      typeDefinition.log('log', 'test'); //this should not log
-      base.log('log', 'test'); //this should log
+      typeDefinition.log('log', 'test'); // this should not log
+      base.log('log', 'test'); // this should log
       consoleCount.log++;       
       expect(sjs.Base.console.log.callCount, 'check with log count').to.equal(consoleCount.log);
 
@@ -100,17 +100,17 @@
       var typeDefinition = new sjs.TypeDefinition();
 
       sjs.enableLogging = false;
-      base.log('log', 'test'); //this should not log
-      typeDefinition.log('log', 'test'); //this should not log
+      base.log('log', 'test'); // this should not log
+      typeDefinition.log('log', 'test'); // this should not log
 
       base.enableLogging = true;
-      base.log('log', 'test'); //this should log
+      base.log('log', 'test'); // this should log
       consoleCount.log++;
-      typeDefinition.log('log', 'test'); //this should not log
+      typeDefinition.log('log', 'test'); // this should not log
 
       sjs.enableLogging = true;
-      base.log('log', 'test'); //this should log
-      typeDefinition.log('log', 'test'); //this should log
+      base.log('log', 'test'); // this should log
+      typeDefinition.log('log', 'test'); // this should log
       consoleCount.log += 2;
 
       expect(sjs.Base.console.log.callCount, 'check with log count').to.equal(consoleCount.log);
@@ -137,7 +137,7 @@
     });
 
     after(function() {
-      //reset console back to original
+      // reset console back to original
       sjs.Base.console = console;
     });
   });
