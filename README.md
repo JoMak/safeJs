@@ -67,7 +67,7 @@ Type definitions can be represented in many ways:
     }, function(param1...
     ```
 
-5. **Styles 1, 2, 3 or 4 under a `types` property inside an object**: This will allow [additional properties](# additional-properties) to be added to the parameter defintion. e.g.
+5. **Styles 1, 2, 3 or 4 under a `types` property inside an object**: This will allow [additional properties](#additional-properties) to be added to the parameter defintion. e.g.
     ```javascript
     sjs.func({ 
       param1: {
